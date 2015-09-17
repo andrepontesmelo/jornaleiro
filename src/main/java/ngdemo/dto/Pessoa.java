@@ -1,10 +1,7 @@
-package ngdemo.domain;
+package ngdemo.dto;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
-/**
- * Created by andre on 11/09/15.
- */
 @XmlRootElement
 public class Pessoa {
     private String cidade;

@@ -42,8 +42,8 @@ public class UserMockRepositoryImpl extends GenericMockRepository<User> implemen
     @Override
     public User update(User user) {
         User byId = this.getById(user.getId());
-        byId.setFirstName(user.getFirstName());
-        byId.setLastName(user.getLastName());
+        byId.atribuiNome(user.getFirstName());
+        byId.setLastName(user.obtemLastName());
         return byId;
     }
 
@@ -63,7 +63,7 @@ public class UserMockRepositoryImpl extends GenericMockRepository<User> implemen
         for (int i = 0; i < numberOfUsers; i++) {
             User user = new User();
             user.setId(i + 1);
-            user.setFirstName("Foo" + (i + 1));
+            user.atribuiNome("Foo" + (i + 1));
             user.setLastName("Bar" + (i + 1));
             this.users.add(user);
         }

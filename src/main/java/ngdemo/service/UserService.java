@@ -2,12 +2,13 @@ package ngdemo.service;
 
 import ngdemo.domain.User;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Vector;
+
 public class UserService {
 
     public User getDefaultUser() {
-        User user = new User();
-        user.setFirstName("André Melo");
-        user.setLastName("");
-        return user;
+            return new User();
     }
 }

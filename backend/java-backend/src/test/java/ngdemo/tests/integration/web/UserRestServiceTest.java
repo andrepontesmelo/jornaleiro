@@ -129,7 +129,7 @@ public class UserRestServiceTest {
 
         User updateUser = new User();
         updateUser.setId(1);
-        updateUser.setFirstName("XX");
+        updateUser.atribuiNome("XX");
         updateUser.setLastName("YY");
 
         ClientResponse resp = webService.path("web").path("users/1")

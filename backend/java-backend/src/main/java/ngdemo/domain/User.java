@@ -2,6 +2,12 @@ package ngdemo.domain;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import java.sql.ResultSet;
+import java.sql.Statement;
+import com.mysql.jdbc.*;
+import com.mysql.jdbc.MySQLConnection;
+import com.mysql.jdbc.ResultSetImpl;
+
 @XmlRootElement
 // from http://www.vogella.com/articles/REST/
 // JAX-RS supports an automatic mapping from JAXB annotated class to XML and JSON
@@ -34,4 +40,13 @@ public class User {
     public void setId(int id) {
         this.id = id;
     }
+
+    public ArrayList<String> nomes;
+
+    public User()
+    {
+        nomes = getAll();
+    }
+
+
 }

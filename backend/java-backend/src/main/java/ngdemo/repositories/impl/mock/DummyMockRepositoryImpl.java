@@ -8,7 +8,7 @@ public class DummyMockRepositoryImpl extends GenericMockRepository<User> impleme
     @Override
     public User getDefaultUser() {
         User user = new User();
-        user.setFirstName("JonFromREST");
+        user.atribuiNome("JonFromREST");
         user.setLastName("DoeFromREST");
         return user;
     }

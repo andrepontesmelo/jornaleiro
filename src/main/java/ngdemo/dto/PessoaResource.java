@@ -7,11 +7,11 @@ import java.sql.*;
 import java.util.Vector;
 
 @XmlRootElement
-public class PesquisaPessoa {
+public class PessoaResource {
 
     private Vector<Pessoa> pessoas;
 
-    public PesquisaPessoa()
+    public PessoaResource()
     {
         try {
             this.pessoas = getAll();

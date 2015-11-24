@@ -12,6 +12,7 @@ dependencies {
     compile 'com.sun.jersey:jersey-servlet:1.17.1'
     compile 'com.sun.jersey:jersey-json:1.17.1'
     compile 'javax.xml:jaxb-api:2.1'
+    compile 'log4j:log4j:1.2.16'
     testCompile 'junit:junit:3.8.1'
 }
 

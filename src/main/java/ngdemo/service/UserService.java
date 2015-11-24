@@ -1,10 +1,11 @@
 package ngdemo.service;
 
-import ngdemo.dto.PesquisaPessoa;
+import ngdemo.dto.MercadoriaResource;
+import ngdemo.dto.PessoaResource;
 
 public class UserService {
-
-    public PesquisaPessoa getDefaultUser() {
-            return new PesquisaPessoa();
+    public PessoaResource getPessoaResource() {
+            return new PessoaResource();
     }
+    public MercadoriaResource getMercadoriaResource() { return new MercadoriaResource(); }
 }

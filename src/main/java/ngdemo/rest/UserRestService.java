@@ -9,7 +9,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 
-@Path("/users")
+@Path("/pessoas")
 public class UserRestService {
 
     @GET

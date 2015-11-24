@@ -32,7 +32,7 @@ public class PesquisaPessoa {
 
         ResultSet result = s.executeQuery("select p.nome,p.codigo, l.nome from pessoa p " +
                 " join endereco e on p.codigo = e.pessoa " +
-                " join localidade l on e.localidade=l.codigo");
+                " join localidade l on e.localidade=l.codigo limit 500");
 
         while (result.next()) {
             Pessoa novo = new Pessoa(result.getString(1));

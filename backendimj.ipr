@@ -45,7 +45,7 @@
   </component>
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/angulardemorestful.iml" filepath="$PROJECT_DIR$/angulardemorestful.iml"/>
+      <module fileurl="file://$PROJECT_DIR$/backendimj.iml" filepath="$PROJECT_DIR$/backendimj.iml"/>
     </modules>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" assert-keyword="true" jdk-15="true" project-jdk-type="JavaSDK" assert-jdk-15="true" project-jdk-name="1.8">

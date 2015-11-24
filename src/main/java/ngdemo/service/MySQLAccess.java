@@ -14,7 +14,7 @@ public class MySQLAccess {
     private MySQLAccess() {
     }
 
-    private static final String URL = "jdbc:mysql://192.168.1.25:46033/imjoias";
+    private static final String URL = "jdbc:mysql://localhost:3306/imjoias";
     private static final String USERNAME = "root";
     private static final String PASSWORD = "mircvinhad";
 

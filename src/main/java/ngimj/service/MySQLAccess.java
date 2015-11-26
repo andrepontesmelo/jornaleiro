@@ -1,4 +1,4 @@
-package ngdemo.service;
+package ngimj.service;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

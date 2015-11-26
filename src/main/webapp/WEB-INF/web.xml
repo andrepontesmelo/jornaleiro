@@ -18,7 +18,7 @@
 
         <init-param>
             <param-name>com.sun.jersey.config.property.packages</param-name>
-            <param-value>ngdemo.rest</param-value>
+            <param-value>ngimj.rest</param-value>
         </init-param>
 
         <init-param>

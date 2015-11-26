@@ -1,4 +1,4 @@
-package ngdemo.dto;
+package ngimj.dto;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -26,6 +26,5 @@ public class Mercadoria {
 
     public Mercadoria()
     {
-
     }
 }

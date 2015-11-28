@@ -3,15 +3,10 @@ package ngimj.rest;
 import ngimj.dto.MercadoriaXml;
 import ngimj.dto.MercadoriasXml;
 import ngimj.service.Service;
-import org.apache.log4j.Logger;
-import org.apache.log4j.Priority;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-
+import javax.ws.rs.core.Response;
 
 @Path("/mercadorias")
 public class MercadoriasRestService {
@@ -27,5 +22,17 @@ public class MercadoriasRestService {
     @Produces(MediaType.APPLICATION_JSON)
     public MercadoriaXml getMercadoria(@PathParam("referencia") String referencia) throws Exception {
         return new Service().getMercadoriaXml(referencia);
+    }
+
+    @PUT
+    @Path("{referencia: \\d+}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response putMercadoria(@PathParam("referencia") String referencia,
+              MercadoriaXml mercadoria) throws Exception {
+
+        new Service().updateMercadoria(mercadoria);
+
+        return Response.noContent().build();
     }
 }

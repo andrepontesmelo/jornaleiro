@@ -1,5 +1,6 @@
 package ngimj.service;
 
+import ngimj.db.Mercadoria;
 import ngimj.dto.ComponentesCustoXml;
 import ngimj.dto.MercadoriaXml;
 import ngimj.dto.MercadoriasXml;
@@ -15,4 +16,7 @@ public class Service  {
 
     public MercadoriaXml getMercadoriaXml(String referencia) throws Exception { return new MercadoriaXml(referencia); }
 
+    public void updateMercadoria(MercadoriaXml mercadoria) throws Exception {
+        Mercadoria.update(mercadoria);
+    }
 }

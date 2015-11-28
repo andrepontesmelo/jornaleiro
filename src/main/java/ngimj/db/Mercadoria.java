@@ -1,5 +1,6 @@
 package ngimj.db;
 
+import ngimj.dto.MercadoriaXml;
 import ngimj.service.MySQLAccess;
 
 import java.sql.Connection;
@@ -62,5 +63,28 @@ public class Mercadoria {
         connection.close();
 
         return novo;
+    }
+
+    public static void update(MercadoriaXml mercadoria) throws Exception {
+
+        Connection connection = MySQLAccess.getInstance().getConnection();
+
+        if (connection == null)
+            return;
+
+        connection.setAutoCommit(true);
+        Statement s = connection.createStatement();
+
+        ngimj.dto.Mercadoria m = mercadoria.getMercadoria();
+
+        s.execute("UPDATE mercadoria set faixa='" + m.getFaixa() + "', " +
+                " teor=" + m.getTeor() + ", " +
+                " nome='" + m.getNome() + "', " +
+                " peso=" + m.getPeso() + ", " +
+                " foradelinha=" + m.isForaDeLinha() +
+                " WHERE referencia='" + m.getReferencia() + "' ");
+
+
+        //connection.commit();
     }
 }

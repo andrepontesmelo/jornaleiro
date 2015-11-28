@@ -3,10 +3,10 @@ package ngimj.rest;
 import ngimj.dto.PessoaXml;
 import ngimj.service.Service;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.xml.bind.JAXBElement;
 
 
 @Path("/pessoas")
@@ -18,4 +18,12 @@ public class PessoaRestService {
         Service userService = new Service();
         return userService.getPessoaXml();
     }
+
+    @PUT
+    @Consumes(MediaType.APPLICATION_XML)
+    public Response putTodo(JAXBElement<PessoaXml> todo) {
+        PessoaXml c = todo.getValue();
+        return Response.noContent().build();
+    }
+
 }

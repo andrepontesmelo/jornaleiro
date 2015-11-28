@@ -45,12 +45,17 @@ public class Mercadoria {
 
         Statement s = connection.createStatement();
 
-        ResultSet result = s.executeQuery("select referencia, faixa from mercadoria where referencia='" + referencia + "'");
+        ResultSet result = s.executeQuery("select referencia, faixa, teor, nome, peso, foradelinha " +
+                " from mercadoria where referencia='" + referencia + "'");
 
         while (result.next()) {
             novo = new ngimj.dto.Mercadoria();
             novo.setReferencia(result.getString(1));
             novo.setFaixa(result.getString(2));
+            novo.setTeor(result.getInt(3));
+            novo.setNome(result.getString(4));
+            novo.setPeso(result.getDouble(5));
+            novo.setForaDeLinha(result.getBoolean(6));
         }
 
         s.close();

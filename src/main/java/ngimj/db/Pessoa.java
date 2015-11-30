@@ -20,9 +20,9 @@ public class Pessoa {
 
         Statement s = connection.createStatement();
 
-        ResultSet result = s.executeQuery("select p.nome,p.codigo, l.nome from pessoa p " +
+        ResultSet result = s.executeQuery("select p.nome, p.codigo, min(l.nome) from pessoa p " +
                 " join endereco e on p.codigo = e.pessoa " +
-                " join localidade l on e.localidade=l.codigo limit 500");
+                " join localidade l on e.localidade=l.codigo GROUP BY p.codigo");
 
         while (result.next()) {
             ngimj.dto.Pessoa novo = new ngimj.dto.Pessoa(result.getString(1));

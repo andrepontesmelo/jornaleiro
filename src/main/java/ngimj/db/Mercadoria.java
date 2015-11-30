@@ -1,6 +1,6 @@
 package ngimj.db;
 
-import ngimj.dto.MercadoriaXml;
+import ngimj.dto.*;
 import ngimj.service.MySQLAccess;
 
 import java.sql.Connection;
@@ -72,19 +72,34 @@ public class Mercadoria {
         if (connection == null)
             return;
 
-        connection.setAutoCommit(true);
+        connection.setAutoCommit(false);
         Statement s = connection.createStatement();
 
         ngimj.dto.Mercadoria m = mercadoria.getMercadoria();
 
-        s.execute("UPDATE mercadoria set faixa='" + m.getFaixa() + "', " +
-                " teor=" + m.getTeor() + ", " +
-                " nome='" + m.getNome() + "', " +
-                " peso=" + m.getPeso() + ", " +
-                " foradelinha=" + m.isForaDeLinha() +
-                " WHERE referencia='" + m.getReferencia() + "' ");
+        try {
+            s.execute("UPDATE mercadoria set faixa='" + m.getFaixa() + "', " +
+                    " teor=" + m.getTeor() + ", " +
+                    " nome='" + m.getNome() + "', " +
+                    " peso=" + m.getPeso() + ", " +
+                    " foradelinha=" + m.isForaDeLinha() +
+                    " WHERE referencia='" + m.getReferencia() + "' ");
 
+            s.execute("DELETE FROM vinculomercadoriacomponentecusto where mercadoria='" + m.getReferencia() + "'");
 
-        //connection.commit();
+            for (ngimj.dto.VinculoMercadoriaComponenteCusto c : mercadoria.getComponenteCustos()) {
+                s.execute("INSERT INTO vinculomercadoriacomponentecusto (mercadoria, componentecusto, quantidade) VALUES (" +
+                        "'" + m.getReferencia() + "', '" +
+                        c.getCodigo() + "', " +
+                        c.getQuantidade() + ")");
+            }
+
+            connection.commit();
+        } catch (Exception err)
+        {
+            connection.rollback();
+
+            throw new Exception("Transação Cancelada: " + err.toString());
+        }
     }
 }

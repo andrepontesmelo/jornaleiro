@@ -2,6 +2,7 @@ package ngimj.rest;
 
 import ngimj.dto.MercadoriaXml;
 import ngimj.dto.MercadoriasXml;
+import ngimj.dto.NovosPrecosXml;
 import ngimj.service.Service;
 
 import javax.ws.rs.*;
@@ -18,10 +19,10 @@ public class MercadoriasRestService {
     }
 
     @GET
-    @Path("{referencia: \\d+}")
+    @Path("{referencia: \\d+}/novos-preços")
     @Produces(MediaType.APPLICATION_JSON)
-    public MercadoriaXml getMercadoria(@PathParam("referencia") String referencia) throws Exception {
-        return new Service().getMercadoriaXml(referencia);
+    public NovosPrecosXml getNovosPrecos(@PathParam("referencia") String referencia) throws Exception {
+        return new Service().getNovosPrecosXml(referencia);
     }
 
     @PUT

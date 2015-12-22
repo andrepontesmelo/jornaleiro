@@ -1,10 +1,9 @@
 package ngimj.service;
 
 import ngimj.db.Mercadoria;
-import ngimj.dto.ComponentesCustoXml;
-import ngimj.dto.MercadoriaXml;
-import ngimj.dto.MercadoriasXml;
-import ngimj.dto.PessoaXml;
+import ngimj.dto.*;
+
+import java.sql.SQLException;
 
 public class Service  {
     public PessoaXml getPessoaXml() {
@@ -18,5 +17,9 @@ public class Service  {
 
     public void updateMercadoria(MercadoriaXml mercadoria) throws Exception {
         Mercadoria.update(mercadoria);
+    }
+
+    public NovosPrecosXml getNovosPrecosXml(String referencia) throws SQLException {
+        return new NovosPrecosXml(referencia);
     }
 }

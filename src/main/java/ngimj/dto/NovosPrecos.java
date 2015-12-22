@@ -4,16 +4,6 @@ public class NovosPrecos {
     private double novoIndiceAtacado;
     private double novoPrecoCusto;
 
-    private String mercadoria;
-
-    public String getMercadoria() {
-        return mercadoria;
-    }
-
-    public void setMercadoria(String mercadoria) {
-        this.mercadoria = mercadoria;
-    }
-
     public double getNovoIndiceAtacado() {
         return novoIndiceAtacado;
     }

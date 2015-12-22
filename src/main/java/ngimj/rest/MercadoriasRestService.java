@@ -18,6 +18,14 @@ public class MercadoriasRestService {
         return new Service().getMercadoriasXml();
     }
 
+
+    @GET
+    @Path("{referencia: \\d+}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public MercadoriaXml getMercadoria(@PathParam("referencia") String referencia) throws Exception {
+        return new Service().getMercadoriaXml(referencia);
+    }
+
     @GET
     @Path("{referencia: \\d+}/novos-preços")
     @Produces(MediaType.APPLICATION_JSON)

@@ -67,12 +67,19 @@ module Jornaleiro
           page.execute_script "window.close();"
         end
 
+
         lista_resultado.push(artigo_resultado);
       }
 
       puts ""
 
       lista_resultado
+
+    rescue Capybara::ElementNotFound
+      puts "Elemento não encontrado, retry!"
+      sleep 10
+      retry
+
     end
 
     JornalBH.new.inicia

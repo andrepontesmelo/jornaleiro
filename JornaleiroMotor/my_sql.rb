@@ -1,14 +1,7 @@
 require 'mysql2'
+require_relative 'arquivo'
 
 module Jornaleiro
-  class Arquivo
-    def le(sessao, data, pagina)
-      conteudo = File.read("/tmp/#{sessao}_#{data} #{pagina}.pdf?sequence=1.transcrito")
-
-      conteudo
-    end
-  end
-
   class MySQL
     def initialize
       @cliente = Mysql2::Client.new(:host => "localhost", :username => "root",
@@ -16,15 +9,14 @@ module Jornaleiro
     end
 
     def limpa_string(conteudo)
+      conteudo = conteudo.gsub("\"","'")
       conteudo = conteudo.gsub("'","\\\\'")
-      conteudo = conteudo.gsub("\"","\\\\\"")
-
       conteudo
     end
 
-
     def destroy
       #@con.close if @con
+      @cliente.close
     end
 
     def insere_documento(data, pagina, sessaoId, conteudo, titulo, url)
@@ -45,12 +37,15 @@ module Jornaleiro
     rescue Mysql2::Error => e
       puts e.errno
       puts e.error
+
+#      File.open("error.txt", 'w') { |file| file.write(sql) }
+#      exit 2
     end
 
     def obtem_ultima_data(idJornal)
 
      sql = "select min(data) as data from documento d join sessao s on d.sessao=s.id and s.jornal=#{idJornal} " +
-         (idJornal == 1 ? " and data > '2012-06-01'" : " and data > '2012-06-14' ")
+         (idJornal == 1 ? " and data > '2012-06-01'" : "  ")
 
      resultado = @cliente.query(sql).entries[0]["data"]
 

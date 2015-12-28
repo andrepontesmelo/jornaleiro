@@ -27,6 +27,16 @@ module Jornaleiro
       1
     end
 
+    def obtem_proxima_data(data)
+      data -= 1
+
+      while (data.sunday? || data.monday?)
+        data -= 1
+      end
+
+      data
+    end
+
 
     def obtem_sessao(titulo_sessao)
       noticiario_window = window_opened_by do
@@ -59,7 +69,10 @@ module Jornaleiro
 
     def obter_links(dia, mes, ano)
 
-      visit('http://jornal.iof.mg.gov.br/xmlui/handle/123456789/136529')
+      page.reset_session!
+
+#      //xmlui/handle/123456789/136529
+      visit('http://jornal.iof.mg.gov.br/')
 
       within("#links-constantes-direita") do
         click_on(ano)
@@ -87,6 +100,10 @@ module Jornaleiro
       end
 
       jornalMg
+
+    rescue Capybara::Poltergeist::TimeoutError
+      sleep 10
+      retry
     end
 
     def transcrever()

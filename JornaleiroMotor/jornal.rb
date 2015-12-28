@@ -6,7 +6,7 @@ module Jornaleiro
      def obtem_proxima_data(data)
       data -= 1
 
-      while (data.sunday? || data.monday?)
+      while (data.sunday?)
         data -= 1
       end
 

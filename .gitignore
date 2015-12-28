@@ -1,3 +1,5 @@
 .idea/
 Gemfile.lock
+*.pdf*
+pdfs.links
 

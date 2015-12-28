@@ -2,43 +2,29 @@ require 'capybara/poltergeist'
 require 'rubygems'
 require 'capybara'
 require 'capybara/dsl'
-require_relative 'MySQL'
+require_relative 'my_sql'
+require_relative 'capybara_util'
+require_relative 'jornal'
 
-begin
-  require 'capybara/poltergeist'
-  Capybara.javascript_driver = :poltergeist
-  Capybara.current_driver = :poltergeist
-  Capybara.run_server = false|
+#CapybaraUtil.new.SelecionaMotor(:selenium)
+CapybaraUtil.new.SelecionaMotor(:poltergeist)
 
-      options = {js_errors: false}
-  Capybara.register_driver :poltergeist do |app|
-    Capybara::Poltergeist::Driver.new(app, options)
-  end
-end
-
-=begin
-Capybara.current_driver = :selenium
-Capybara::Selenium::Driver.class_eval do
-  def quit
-    puts "Press RETURN to quit the browser"
-    $stdin.gets
-    @browser.quit
-  rescue Errno::ECONNREFUSED
-    # Browser must have already gone
-  end
-end
-=end
-
-Capybara.app_host = 'http://jornal.iof.mg.gov.br/'
-Capybara.default_host = 'http://jornal.iof.mg.gov.br/'
+Capybara.app_host = Capybara.default_host = 'http://jornal.iof.mg.gov.br/'
 
 module Jornaleiro
 
-  class JornalMg
+  class JornalMg < Jornal
+
     include Capybara::DSL
 
     def initialize
       @lista_pdfs = Array.new
+
+      @meses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"]
+    end
+
+    def obtem_codigo_jornal
+      1
     end
 
 
@@ -71,17 +57,15 @@ module Jornaleiro
     end
 
 
-    def obter_links(dia)
+    def obter_links(dia, mes, ano)
 
-      puts ""
-      puts "Obtendo dia " + dia
-      visit('/jspui/UltimoJornal')
+      visit('http://jornal.iof.mg.gov.br/xmlui/handle/123456789/136529')
 
-      within("#id-pilha-navegacao") do
-        click_on('2015')
+      within("#links-constantes-direita") do
+        click_on(ano)
       end
 
-      click_on('Julho')
+      click_on(@meses[mes.to_i - 1])
 
       within("#id-lista-subcomunidades") do
         link_dia = page.find_link(dia.to_s)
@@ -91,14 +75,14 @@ module Jornaleiro
 
       jornalMg = []
 
-      jornalMg.push([3, 'caderno2', obtem_sessao("Publicações de Terceiros e Editais de Comarcas")])
+      jornalMg.push([3, 'caderno3', obtem_sessao("Publicações de Terceiros")])
       jornalMg.push([1, 'noticiario', obtem_sessao("Noticiário")])
       jornalMg.push([2, 'caderno1', obtem_sessao("Diário do Executiv")])
 
       puts @lista_pdfs
       puts jornalMg
 
-      File.open("pdfs.links", "w+") do |f|
+      File.open("/tmp/pdfs.links", "w+") do |f|
         @lista_pdfs.each { |element| f.puts(element) }
       end
 
@@ -106,35 +90,59 @@ module Jornaleiro
     end
 
     def transcrever()
-      puts system('rm *.transcrito')
-      puts system('rm *.pdf*')
-      puts system('cat pdfs.links | parallel --gnu "wget {}"')
-      puts system('for file in *.pdf*; do pdftotext "$file" "$file.transcrito"; done')
+      Dir.chdir("/tmp") do
+        puts system(' rm *.transcrito')
+        puts system('rm *.pdf*')
+        puts system('cat pdfs.links | parallel --gnu "wget {}"')
+        puts system('for file in *.pdf*; do pdftotext "$file" "$file.transcrito"; done')
+      end
     end
+
+    def inicia_data(dia, mes, ano, data)
+
+      jornalMg = obter_links(dia, mes, ano)
+      transcrever
+
+      mysql = MySQL.new
+      mysql.insere(jornalMg, data)
+      mysql.destroy()
+
+    rescue Capybara::ElementNotFound => e
+      puts e
+      puts "Pulando dia " + data
+    end
+
   end
 
+  JornalMg.new.inicia
+=begin
+ ano = 2012
 
-
-  for dia in 26..31
+ for mes in 5..5
+  for dia in 10..31
     begin
 
       dia = sprintf('%02.f', dia)
-      data = '2015-07-' + dia.to_s
+      mes = sprintf('%02.f', mes)
+      data = ano.to_s + '-' + mes.to_s + '-' + dia.to_s
       t = JornalMg.new
 
-      jornalMg = t.obter_links(dia) # Dia
+      jornalMg = t.obter_links(dia, mes, ano) # Dia
 
       t.transcrever
 
       mysql = MySQL.new
       mysql.insere(jornalMg, data)
       mysql.destroy()
-    rescue Capybara::ElementNotFound
+    rescue Capybara::ElementNotFound => e
+      puts e
       puts "Pulando dia " + data
+#throw e
       next
     end
   end
-
+ end
+=end
 
 end
 

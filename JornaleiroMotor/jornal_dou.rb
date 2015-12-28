@@ -2,52 +2,74 @@ require 'capybara/poltergeist'
 require 'rubygems'
 require 'capybara'
 require 'capybara/dsl'
-require_relative 'MySQL'
+require_relative 'my_sql'
+require_relative 'jornal'
+require_relative 'capybara_util'
 
-Capybara.current_driver = :selenium
-Capybara::Selenium::Driver.class_eval do
-  def quit
-    puts "Press RETURN to quit the browser"
-    $stdin.gets
-    @browser.quit
-  rescue Errno::ECONNREFUSED
-    # Browser must have already gone
-  end
-end
+#CapybaraUtil.new.SelecionaMotor :selenium
+CapybaraUtil.new.SelecionaMotor :poltergeist
 
 Capybara.app_host = 'http://in.gov.br/'
 
-class JornalDOU
-  include Capybara::DSL
+module Jornaleiro
 
-  def initialize
+  class JornalDOU < Jornal
+    include Capybara::DSL
 
-  end
-
-  def download()
-    visit "http://portal.in.gov.br/#leitura_jornais"
-    check "chk_avancada_0"
-    fill_in "dt_inicio_leitura_jornais", with: "28/12"
-    fill_in "dt_fim_leitura_jornais", with: "28/12"
-
-    resultado_busca = window_opened_by do
-      click_on "BUSCAR"
+    def initialize
     end
 
-    within_window resultado_busca do
+    def download()
+      visit "http://portal.in.gov.br/#leitura_jornais"
+      check "chk_avancada_0"
+      fill_in "dt_inicio_leitura_jornais", with: "28/12"
+      fill_in "dt_fim_leitura_jornais", with: "28/12"
 
+      resultado_busca = window_opened_by do
+        click_on "BUSCAR"
+      end
 
-    end
+      within_window resultado_busca do
+        janela_pdf = window_opened_by do
+
+          find("#ResultadoConsulta").all('a')[0].click
+
+          #Get the popup window handle
+         popup = page.driver.browser.window_handles.last
+
+          #Then switch control between the windows
+          page.driver.browser.switch_to.window(popup)
+
+          within_frame('visualizador'){
+            #find("#download").click
+            #puts page.response_headers
+            #puts page.response_headers['Content-Disposition']
+
+            puts page.text.length
+            while (page.text.length < 200)
+              sleep 0.5
+            end
+
+            puts page.text
+          }
+
+        end
+      end
+
+#      within_window janela_pdf  do
+#        puts "Dentro da janela pdf"
+#      end
 
 #puts system("cd /tmp")
 #puts system('wget http://download.in.gov.br/do/secao1/2015/2015_12_24/DO1_2015_12_24.pdf')
 #puts system('pdftotext DO1_2015_12_23.pdf DO1_2015_12_23.txt')
+    end
+
+    def soma(a, b)
+
+      a+b
+    end
+
+    JornalDOU.new.download()
   end
-
-  def soma(a, b)
-
-    a+b
-  end
-
-  JornalDOU.new.download()
 end

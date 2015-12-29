@@ -9,7 +9,7 @@ require_relative 'jornal'
 #CapybaraUtil.new.SelecionaMotor(:selenium)
 CapybaraUtil.new.SelecionaMotor(:poltergeist)
 
-Capybara.app_host = Capybara.default_host = 'http://jornal.iof.mg.gov.br/'
+Capybara.app_host = Capybara.default_host = 'http://www.iof.mg.gov.br/'
 
 module Jornaleiro
 
@@ -72,7 +72,7 @@ module Jornaleiro
       page.reset_session!
 
 #      //xmlui/handle/123456789/136529
-      visit('http://jornal.iof.mg.gov.br/')
+      visit('/index.php?/ultima-edicao.html')
 
       within("#links-constantes-direita") do
         click_on(ano)

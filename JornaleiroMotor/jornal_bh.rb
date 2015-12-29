@@ -23,7 +23,7 @@ module Jornaleiro
     end
 
     def inicia_data(dia, mes, ano, data)
-      lista_resultado = obter_conteudo(dia, mes, ano)
+      lista_resultado = obter_mconteudo(dia, mes, ano)
 
       mysql = MySQL.new
 
@@ -39,6 +39,8 @@ module Jornaleiro
     def obter_conteudo(dia, mes, ano)
 
       lista_resultado = Array.new();
+
+      page.reset_session!
 
       visit("/dom/iniciaEdicao.do?method=DomDia&dia=" + dia + "/" + mes + "/" + ano + "&comboAno=" + ano)
       #visit ("a.html")
@@ -69,13 +71,14 @@ module Jornaleiro
 
 
         lista_resultado.push(artigo_resultado);
+
       }
 
       puts ""
 
       lista_resultado
 
-    rescue Capybara::ElementNotFound
+    rescue Capybara::ElementNotFound, Capybara::TimeoutError
       puts "Elemento não encontrado, retry!"
       sleep 10
       retry

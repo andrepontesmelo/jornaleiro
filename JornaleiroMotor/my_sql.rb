@@ -5,7 +5,7 @@ module Jornaleiro
   class MySQL
     def initialize
       @cliente = Mysql2::Client.new(:host => "localhost", :username => "root",
-                                    :password => "", :database => "jornaleiro")
+                                    :password => "mircvinhad", :database => "jornaleiro")
     end
 
     def limpa_string(conteudo)

@@ -9,7 +9,8 @@ require_relative 'jornal'
 #CapybaraUtil.new.SelecionaMotor(:selenium)
 CapybaraUtil.new.SelecionaMotor(:poltergeist)
 
-Capybara.app_host = Capybara.default_host = 'http://www.iof.mg.gov.br/'
+
+Capybara.app_host = Capybara.default_host = 'http://jornal.iof.mg.gov.br/jspui/UltimoJornal'
 
 module Jornaleiro
 
@@ -69,10 +70,14 @@ module Jornaleiro
 
     def obter_links(dia, mes, ano)
 
-      page.reset_session!
+	puts ("Obtendo links para dia #{dia} do mes #{mes}, ano #{ano}")
+      
+ 	page.reset_session!
+        @lista_pdfs.clear()
+
 
 #      //xmlui/handle/123456789/136529
-      visit('/index.php?/ultima-edicao.html')
+      visit('http://jornal.iof.mg.gov.br/jspui/UltimoJornal')
 
       within("#links-constantes-direita") do
         click_on(ano)
@@ -92,9 +97,11 @@ module Jornaleiro
       jornalMg.push([1, 'noticiario', obtem_sessao("Noticiário")])
       jornalMg.push([2, 'caderno1', obtem_sessao("Diário do Executiv")])
 
+      puts "Lista dos pdfs:"
       puts @lista_pdfs
       puts jornalMg
 
+#      File.delete("/tmp/pdfs.links");
       File.open("/tmp/pdfs.links", "w+") do |f|
         @lista_pdfs.each { |element| f.puts(element) }
       end
@@ -107,6 +114,8 @@ module Jornaleiro
     end
 
     def transcrever()
+	puts("Transcrevendo links => txt do conteudo do pdf..");
+
       Dir.chdir("/tmp") do
         puts system(' rm *.transcrito')
         puts system('rm *.pdf*')

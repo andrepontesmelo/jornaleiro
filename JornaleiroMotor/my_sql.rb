@@ -5,7 +5,7 @@ module Jornaleiro
   class MySQL
     def initialize
       @cliente = Mysql2::Client.new(:host => "localhost", :username => "root",
-                                    :password => "mircvinhad", :database => "jornaleiro")
+                                    :password => "", :database => "jornaleiro")
     end
 
     def limpa_string(conteudo)
@@ -44,8 +44,7 @@ module Jornaleiro
 
     def obtem_ultima_data(idJornal)
 
-     sql = "select min(data) as data from documento d join sessao s on d.sessao=s.id and s.jornal=#{idJornal} " +
-         (idJornal == 1 ? " and data > '2012-06-01'" : "  ")
+     sql = "select min(data) as data from documento d join sessao s on d.sessao=s.id and s.jornal=#{idJornal} "
 
      resultado = @cliente.query(sql).entries[0]["data"]
 

@@ -23,16 +23,18 @@ module Jornaleiro
     end
 
     def inicia_data(dia, mes, ano, data)
-      lista_resultado = obter_mconteudo(dia, mes, ano)
+      lista_resultado = obter_conteudo(dia, mes, ano)
 
-      mysql = MySQL.new
+      if (!lista_resultado.nil?)
+          mysql = MySQL.new
 
-      lista_resultado.each_with_index { |artigo, indice|
+	  lista_resultado.each_with_index { |artigo, indice|
 
-        mysql.insere_documento(data, indice, 4, artigo[1], artigo[0], artigo[2])
-      }
-
-      mysql.destroy()
+	  mysql.insere_documento(data, indice, 4, artigo[1], artigo[0], artigo[2])
+           }
+          
+          mysql.destroy()
+	end
     end
 
 
@@ -78,10 +80,10 @@ module Jornaleiro
 
       lista_resultado
 
-    rescue Capybara::ElementNotFound, Capybara::TimeoutError
-      puts "Elemento não encontrado, retry!"
-      sleep 10
-      retry
+    rescue Capybara::ElementNotFound, Capybara::Poltergeist::TimeoutError, Capybara::Poltergeist::DeadClient => e
+      puts e.message
+#      sleep 10
+#      retry
 
     end
 

@@ -36,23 +36,6 @@ module Jornaleiro
       end
     end
 
-    def obtem_proxima_data(data, ordem)
-      incremento = (ordem == :mais_antigos ? -1 : 1)
-
-      data -= incremento
-
-      while (!data_possivel(data))
-        data -= incremento
-      end
-
-      if (data > Date.today)
-        data = nil
-      end
-
-      data
-    end
-
-
     def obtem_sessao(titulo_sessao)
       noticiario_window = window_opened_by do
         click_on(titulo_sessao)
@@ -107,7 +90,9 @@ module Jornaleiro
 
       jornalMg = []
 
-      jornalMg.push([3, 'caderno3', obtem_sessao("Publicações de Terceiros")])
+      
+      caderno3 = (ano.to_i < 2015 ? 'caderno3' : 'caderno2')
+      jornalMg.push([3, caderno3, obtem_sessao("Publicações de Terceiros")])
       jornalMg.push([1, 'noticiario', obtem_sessao("Noticiário")])
       jornalMg.push([2, 'caderno1', obtem_sessao("Diário do Executiv")])
 

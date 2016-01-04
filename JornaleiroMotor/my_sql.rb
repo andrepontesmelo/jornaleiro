@@ -48,8 +48,11 @@ module Jornaleiro
 
      sql = "select #{minmax}(data) as data from documento d join sessao s on d.sessao=s.id and s.jornal=#{idJornal} "
 
+     puts sql
+
      resultado = @cliente.query(sql).entries[0]["data"]
 
+     puts resultado
      resultado
 
     rescue Mysql2::Error => e

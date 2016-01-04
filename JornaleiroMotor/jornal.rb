@@ -3,15 +3,8 @@ module Jornaleiro
 
   class Jornal
 
-    def data_possivel(data)
-      if (data.sunday? || data.monday?)
-        return false
-      else
-        return true
-      end
-    end
-
     def obtem_proxima_data(data, ordem)
+      puts ordem
       incremento = (ordem == :mais_antigos ? -1 : 1)
 
       data += incremento
@@ -27,6 +20,14 @@ module Jornaleiro
       data
     end
 
+
+    def data_possivel(data)
+      if (data.sunday? || data.monday?)
+        return false
+      else
+        return true
+      end
+    end
 
     def corta_data(data)
 

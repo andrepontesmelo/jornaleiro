@@ -14,10 +14,10 @@ module Jornaleiro
     def obtem_proxima_data(data, ordem)
       incremento = (ordem == :mais_antigos ? -1 : 1)
 
-      data -= incremento
+      data += incremento
 
       while (!data_possivel(data))
-        data -= incremento
+        data += incremento
       end
 
       if (data > Date.today)

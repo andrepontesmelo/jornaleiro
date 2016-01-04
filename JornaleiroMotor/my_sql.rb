@@ -42,9 +42,11 @@ module Jornaleiro
 #      exit 2
     end
 
-    def obtem_ultima_data(idJornal)
+    def obtem_ultima_data(idJornal, ordem)
 
-     sql = "select min(data) as data from documento d join sessao s on d.sessao=s.id and s.jornal=#{idJornal} "
+     minmax = (ordem == :mais_recentes ? "max" : "min")
+
+     sql = "select #{minmax}(data) as data from documento d join sessao s on d.sessao=s.id and s.jornal=#{idJornal} "
 
      resultado = @cliente.query(sql).entries[0]["data"]
 

@@ -191,15 +191,14 @@ module Jornaleiro
 
     end
 
-    def obtem_proxima_data(data)
-      data -= 1
-
-      while (data.sunday? || data.saturday?)
-        data -= 1
+    def data_possivel(data)
+      if (data.sunday? || data.saturday?)
+        return false
+      else
+        return true
       end
-
-      data
     end
+
 
     def inicia_data(dia, mes, ano, data)
 

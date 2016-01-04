@@ -28,11 +28,25 @@ module Jornaleiro
       1
     end
 
-    def obtem_proxima_data(data)
-      data -= 1
+    def data_possivel(data)
+      if (data.sunday? || data.monday?)
+        return false
+      else
+        return true
+      end
+    end
 
-      while (data.sunday? || data.monday?)
-        data -= 1
+    def obtem_proxima_data(data, ordem)
+      incremento = (ordem == :mais_antigos ? -1 : 1)
+
+      data -= incremento
+
+      while (!data_possivel(data))
+        data -= incremento
+      end
+
+      if (data > Date.today)
+        data = nil
       end
 
       data
@@ -141,42 +155,7 @@ module Jornaleiro
   end
 
   JornalMg.new.inicia
-=begin
- ano = 2012
-
- for mes in 5..5
-  for dia in 10..31
-    begin
-
-      dia = sprintf('%02.f', dia)
-      mes = sprintf('%02.f', mes)
-      data = ano.to_s + '-' + mes.to_s + '-' + dia.to_s
-      t = JornalMg.new
-
-      jornalMg = t.obter_links(dia, mes, ano) # Dia
-
-      t.transcrever
-
-      mysql = MySQL.new
-      mysql.insere(jornalMg, data)
-      mysql.destroy()
-    rescue Capybara::ElementNotFound => e
-      puts e
-      puts "Pulando dia " + data
-#throw e
-      next
-    end
-  end
- end
-=end
 
 end
-
-=begin
-require 'capybara/poltergeist'
-Capybara.javascript_driver = :poltergeist
-Capybara.app_host = 'http://www.google.com'
-visit("/")
-=end
 
 #select * from documento where match(texto) against('+"Martins Pontes"' in boolean mode);

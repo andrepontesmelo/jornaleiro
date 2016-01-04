@@ -2,9 +2,9 @@ require 'capybara/poltergeist'
 require 'rubygems'
 require 'capybara'
 require 'capybara/dsl'
-require_relative 'my_sql'
-require_relative 'capybara_util'
-require_relative 'jornal'
+require_relative '../my_sql'
+require_relative '../capybara_util'
+require_relative '../jornal'
 
 #CapybaraUtil.new.SelecionaMotor(:selenium)
 CapybaraUtil.new.SelecionaMotor(:poltergeist)
@@ -142,5 +142,3 @@ module Jornaleiro
   JornalMg.new.inicia
 
 end
-
-#select * from documento where match(texto) against('+"Martins Pontes"' in boolean mode);

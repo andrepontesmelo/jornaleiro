@@ -2,9 +2,9 @@ require 'capybara/poltergeist'
 require 'rubygems'
 require 'capybara'
 require 'capybara/dsl'
-require_relative 'my_sql'
-require_relative 'jornal'
-require_relative 'capybara_util'
+require_relative '../my_sql'
+require_relative '../jornal'
+require_relative '../capybara_util'
 
 #CapybaraUtil.new.SelecionaMotor :selenium
 CapybaraUtil.new.SelecionaMotor :poltergeist

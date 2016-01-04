@@ -3,9 +3,9 @@ require 'rubygems'
 require 'capybara'
 require 'capybara/dsl'
 require 'json'
-require_relative 'my_sql'
-require_relative 'capybara_util'
-require_relative 'jornal'
+require_relative '../my_sql'
+require_relative '../capybara_util'
+require_relative '../jornal'
 
 #CapybaraUtil.new.SelecionaMotor(:selenium)
 CapybaraUtil.new.SelecionaMotor(:poltergeist)

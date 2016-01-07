@@ -6,8 +6,8 @@ require_relative '../my_sql'
 require_relative '../jornal'
 require_relative '../capybara_util'
 
-#CapybaraUtil.new.SelecionaMotor :selenium
-CapybaraUtil.new.SelecionaMotor :poltergeist
+CapybaraUtil.new.SelecionaMotor :selenium
+#CapybaraUtil.new.SelecionaMotor :poltergeist
 
 Capybara.app_host = 'http://portal.in.gov.br'
 

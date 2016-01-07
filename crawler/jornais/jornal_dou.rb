@@ -202,10 +202,6 @@ module Jornaleiro
 
     def inicia_data(dia, mes, ano, data)
 
-      if (ano.to_i != 2015)
-        raise Exception
-      end
-
       download(dia, mes)
       limpar_arquivos();
       divide_paginas();

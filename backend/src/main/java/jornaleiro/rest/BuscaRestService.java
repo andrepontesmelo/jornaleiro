@@ -2,7 +2,6 @@ package jornaleiro.rest;
 
 import jornaleiro.dto.ResultadoBuscaXml;
 import jornaleiro.service.Service;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;

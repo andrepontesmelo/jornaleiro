@@ -34,6 +34,10 @@ public class ResultadoBuscaXml {
     }
 
     public void filtrarTexto(String query) {
+
+        if (resultadoBusca == null)
+            throw new NullPointerException("A busca não foi feita");
+
         for (ResultadoBusca r : resultadoBusca) {
             r.filtrarTexto(query);
         }

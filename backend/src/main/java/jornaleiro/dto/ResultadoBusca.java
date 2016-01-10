@@ -1,5 +1,7 @@
 package jornaleiro.dto;
 
+import com.sun.jersey.api.NotFoundException;
+
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Date;
 
@@ -76,10 +78,13 @@ public class ResultadoBusca {
     public void filtrarTexto(String query) {
         int posicao = texto.toLowerCase().indexOf(query.toLowerCase());
 
-        if (posicao > 0)
+        if (posicao >= 0)
         {
-            texto = texto.substring(posicao - 50, posicao + 50);
+            int inicio = Math.max(0, posicao - 50);
+            int maximo = Math.min(texto.length(), posicao + 50);
+
+            texto = texto.substring(inicio, maximo);
         } else
-            texto = " Não foi possível localizar ============ ";
+            throw new NotFoundException("termo não encontrado no documento");
     }
 }

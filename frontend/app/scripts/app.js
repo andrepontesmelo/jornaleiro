@@ -29,6 +29,11 @@ angular
         controller: 'AboutCtrl',
         controllerAs: 'about'
       })
+      .when('/busca', {
+        templateUrl: 'views/busca.html',
+        controller: 'BuscaCtrl',
+        controllerAs: 'busca'
+      })
       .otherwise({
         redirectTo: '/'
       });

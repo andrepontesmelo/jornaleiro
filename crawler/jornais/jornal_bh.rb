@@ -3,7 +3,7 @@ require 'rubygems'
 require 'capybara'
 require 'capybara/dsl'
 require 'json'
-require_relative '../my_sql'
+require_relative '../pg_sql'
 require_relative '../capybara_util'
 require_relative '../jornal'
 
@@ -26,14 +26,15 @@ module Jornaleiro
       lista_resultado = obter_conteudo(dia, mes, ano)
 
       if (!lista_resultado.nil?)
-          mysql = MySQL.new
+          pgsql = PgSQL.new
 
-	  lista_resultado.each_with_index { |artigo, indice|
+          lista_resultado.each_with_index { |artigo, indice|
 
-	  mysql.insere_documento(data, indice, 4, artigo[1], artigo[0], artigo[2])
-           }
+            pgsql.insere_documento(data, indice, 4, artigo[1], artigo[0], artigo[2])
+
+          }
           
-          mysql.destroy()
+          pgsql.destroy()
       end
     end
 
@@ -45,7 +46,6 @@ module Jornaleiro
       page.reset_session!
 
       visit("/dom/iniciaEdicao.do?method=DomDia&dia=" + dia + "/" + mes + "/" + ano + "&comboAno=" + ano)
-      #visit ("a.html")
       find('#imgExtRecTodos').click
 
       artigos = all(:css, ".ChamadaArtigo")
@@ -63,7 +63,6 @@ module Jornaleiro
         url = artigo.first("a")["href"]
 
         within_window open_new_window do
-          # do something
           visit(url)
 
           artigo_resultado.push(all("#esquerda")[1].text)
@@ -82,9 +81,6 @@ module Jornaleiro
 
     rescue Capybara::ElementNotFound, Capybara::Poltergeist::TimeoutError, Capybara::Poltergeist::DeadClient => e
       puts e.message
-#      sleep 10
-#      retry
-
     end
 
     JornalBH.new.inicia

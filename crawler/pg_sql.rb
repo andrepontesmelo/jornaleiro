@@ -1,11 +1,10 @@
-require 'mysql2'
+require 'sequel'
 require_relative 'arquivo'
 
 module Jornaleiro
-  class MySQL
+  class PgSQL
     def initialize
-      @cliente = Mysql2::Client.new(:host => "localhost", :username => "root",
-                                    :password => "", :database => "jornaleiro")
+      @cliente = Sequel.postgres(:user=>'jornaleiro',:password=>'',:host=>'localhost',:port=>5432)
     end
 
     def limpa_string(conteudo)
@@ -15,8 +14,7 @@ module Jornaleiro
     end
 
     def destroy
-      #@con.close if @con
-      @cliente.close
+      @cliente.disconnect
     end
 
     def insere_documento(data, pagina, sessaoId, conteudo, titulo, url)
@@ -27,19 +25,18 @@ module Jornaleiro
         titulo = limpa_string(titulo)
       end
 
-      sql = "INSERT INTO documento(sessao, pagina, data, texto, titulo, url) " +
-          " VALUES ( #{sessaoId}, #{pagina}, '#{data}', \"" + conteudo + "\", " +
-        (titulo.nil? ? "null" : ("'" + titulo + "'")) + ", " +
-      (url.nil? ? "null" : ("'" + url + "'")) + " ) ";
+      documentos = @cliente[:documento] # Create a dataset
 
-      @cliente.query(sql)
+      documentos.insert(:sessao => sessaoId,
+                        :pagina => pagina,
+                        :data => data,
+                        :texto => conteudo,
+                        :textominusculo => conteudo.downcase,
+                        :titulo => titulo,
+                        :url => url)
 
-    rescue Mysql2::Error => e
-      puts e.errno
-      puts e.error
-
-#      File.open("error.txt", 'w') { |file| file.write(sql) }
-#      exit 2
+    rescue Exception => e
+      puts e
     end
 
     def obtem_ultima_data(idJornal, ordem)
@@ -50,14 +47,13 @@ module Jornaleiro
 
      puts sql
 
-     resultado = @cliente.query(sql).entries[0]["data"]
+     resultado = Date.parse(@cliente.fetch(sql).first[:data].to_s)
 
      puts resultado
      resultado
 
-    rescue Mysql2::Error => e
-      puts e.errno
-      puts e.error
+    rescue Exception => e
+     puts e
     end
 
 
@@ -67,7 +63,7 @@ module Jornaleiro
         sessao = x[1]
         paginas_total = x[2]
 
-        puts "Adicionando ao MySQL #{sessao} (cód. #{sessaoId}) com total de #{paginas_total} páginas"
+        puts "Adicionando ao PostgreSQL #{sessao} (cód. #{sessaoId}) com total de #{paginas_total} páginas"
 
         arq = Arquivo.new
 

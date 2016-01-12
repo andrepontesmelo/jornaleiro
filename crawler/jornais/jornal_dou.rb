@@ -2,12 +2,12 @@ require 'capybara/poltergeist'
 require 'rubygems'
 require 'capybara'
 require 'capybara/dsl'
-require_relative '../my_sql'
+require_relative '../pg_sql'
 require_relative '../jornal'
 require_relative '../capybara_util'
 
-CapybaraUtil.new.SelecionaMotor :selenium
-#CapybaraUtil.new.SelecionaMotor :poltergeist
+#CapybaraUtil.new.SelecionaMotor :selenium
+CapybaraUtil.new.SelecionaMotor :poltergeist
 
 Capybara.app_host = 'http://portal.in.gov.br'
 
@@ -142,23 +142,13 @@ module Jornaleiro
         end
       end
 
-=begin
-        puts arquivo
-        puts "Ano = #{atributos[:ano]}"
-        puts "Mes = #{atributos[:mes]}"
-        puts "Dia = #{atributos[:dia]}"
-        puts "Página = #{atributos[:pagina]}"
-        puts "Sessão " + atributos[:sessao].to_s
-        puts "====================================="
-=end
-
       atributos
     end
 
-    def insere_mysql(data)
-      puts "Passo 5: Inserindo no MySQL"
+    def insere_bd(data)
+      puts "Passo 5: Inserindo no Banco de Dados"
 
-      mysql = MySQL.new
+      pgsql = PgSQL.new
 
       arquivos = Dir.entries(".")
       arquivos.each { |arquivo|
@@ -182,12 +172,12 @@ module Jornaleiro
 
         if (!atributos.nil?)
           conteudo = File.read(arquivo)
-          mysql.insere_documento(data, atributos[:pagina], atributos[:sessao], conteudo, nil, nil)
+          pgsql.insere_documento(data, atributos[:pagina], atributos[:sessao], conteudo, nil, nil)
           print "."
         end
       }
 
-      mysql.destroy();
+      pgsql.destroy();
 
     end
 
@@ -205,7 +195,7 @@ module Jornaleiro
       download(dia, mes)
       limpar_arquivos();
       divide_paginas();
-      insere_mysql(data);
+      insere_pgsql(data);
 
     rescue Capybara::ElementNotFound => e
       puts e

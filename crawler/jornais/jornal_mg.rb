@@ -2,7 +2,7 @@ require 'capybara/poltergeist'
 require 'rubygems'
 require 'capybara'
 require 'capybara/dsl'
-require_relative '../my_sql'
+require_relative '../pg_sql'
 require_relative '../capybara_util'
 require_relative '../jornal'
 
@@ -128,9 +128,9 @@ module Jornaleiro
       jornalMg = obter_links(dia, mes, ano)
       transcrever
 
-      mysql = MySQL.new
-      mysql.insere(jornalMg, data)
-      mysql.destroy()
+      pgsql = PgSQL.new
+      pgsql.insere(jornalMg, data)
+      pgsql.destroy()
 
     rescue Capybara::ElementNotFound => e
       puts e

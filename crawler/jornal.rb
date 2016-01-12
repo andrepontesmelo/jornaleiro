@@ -39,7 +39,7 @@ module Jornaleiro
     end
 
     def inicia
-      conexao_incial = MySQL.new
+      conexao_incial = PgSQL.new
 
       ordem = :mais_recentes
 

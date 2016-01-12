@@ -1,10 +1,10 @@
 # Bundle 
-dnf -y install gcc mysql-devel ruby-devel rubygems libffi-devel rpm-build zlib-devel  
+dnf -y install gcc ruby-devel rubygems libffi-devel rpm-build zlib-devel libpqxx-devel
 
 # Phantomjs
 dnf install libXext  libXrender  fontconfig  libfontconfig.so.1
 
-# Scripts
+# Linux tools
 dnf install parallel poppler-utils
 
 # Install

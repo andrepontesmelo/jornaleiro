@@ -1,5 +1,6 @@
 # Bundle 
-dnf -y install gcc ruby-devel rubygems libffi-devel rpm-build zlib-devel libpqxx-devel
+dnf -y install gcc ruby-devel rubygems libffi-devel rpm-build zlib-devel libpqxx-devel ImageMagick-devel ImageMagick  bzip2-devel --allowerasing
+
 
 # Phantomjs
 dnf install libXext  libXrender  fontconfig  libfontconfig.so.1

@@ -6,17 +6,18 @@ require_relative '../pg_sql'
 require_relative '../jornal'
 require_relative '../capybara_util'
 
-#CapybaraUtil.new.SelecionaMotor :selenium
-CapybaraUtil.new.SelecionaMotor :poltergeist
-
-Capybara.app_host = 'http://portal.in.gov.br'
-
 module Jornaleiro
 
   class JornalDOU < Jornal
     include Capybara::DSL
 
     def initialize
+      super()
+
+      @diretorio_temporario = "/tmp/dou"
+
+      CapybaraUtil.new.SelecionaMotor :poltergeist
+      Capybara.app_host = 'http://portal.in.gov.br'
     end
 
     def obtem_codigo_jornal
@@ -37,42 +38,67 @@ module Jornaleiro
       end
     end
 
+    def limpar_arquivo(nome_arquivo)
+      nome_arquivo = nome_arquivo[/\w+.pdf/]
+
+      nome_arquivo
+    end
 
     def limpar_arquivos()
       puts "Passo 3: Limpando nomes dos arquivos pdf."
-      arquivos = Dir.entries(".")
+      Dir.chdir(@diretorio_temporario) do
 
-      arquivos.each { |arquivo|
-        pdf_limpo = arquivo[/\w+.pdf/]
+        arquivos = Dir.entries(".")
 
-        if (!pdf_limpo.nil?)
-          puts pdf_limpo
+        arquivos.each { |arquivo|
 
-          File.rename(arquivo, pdf_limpo)
-        end
-      }
+          pdf_limpo = limpar_arquivo(arquivo)
+
+          if (!pdf_limpo.nil?)
+            puts "Renomeando " + arquivo + " para " + pdf_limpo
+            File.rename(arquivo, pdf_limpo)
+          end
+        }
+
+      end
     end
+
 
     def divide_paginas
       puts "Passo 4: Dividindo pdfs por página"
-      arquivos = Dir.entries(".")
+      Dir.chdir(@diretorio_temporario) do
+        arquivos = Dir.entries(".")
 
-      arquivos.each { |arquivo|
-        pdf = arquivo[/\w+.pdf/]
+        arquivos.each { |arquivo|
+          pdf = arquivo[/\w+.pdf/]
 
-        if (!pdf.nil?)
-          saida = `pdfinfo #{pdf} | grep Pages:`
-          total_paginas = saida.split(" ").last.to_i;
+          if (!pdf.nil?)
+            saida = `pdfinfo #{pdf} | grep Pages:`
+            total_paginas = saida.split(" ").last.to_i;
 
-          for p in 1..total_paginas
-            resultado = system("pdftotext -f #{p} -l #{p} #{pdf} #{pdf}_#{p}")
+            puts "Transcrevendo pdfs para txts, limpando espaços e quebras de linha e hifenização:"
+
+            for p in 1..total_paginas
+              print '.'
+              pdf_com_pagina = "#{pdf}_#{p}"
+              pdf_limpo = "#{pdf_com_pagina}_limpo"
+
+              system("pdftotext -raw -f #{p} -l #{p} #{pdf} #{pdf_com_pagina} ")
+              system("tr '\n' ' ' < #{pdf_com_pagina} | tr -s ' ' >> #{pdf_limpo}")
+              system("sed -i -- 's/- //g' '#{pdf_limpo}'")
+              system("mv #{pdf_limpo} #{pdf_com_pagina}")
+            end
+
+            puts "mv #{@diretorio_temporario}/#{arquivo} /home/dou/#{arquivo} "
+            system("mv #{@diretorio_temporario}/#{arquivo} /home/dou/#{arquivo} ")
           end
-        end
-      }
+        }
+      end
     end
 
 
-    def download(dia, mes)
+    def download(dia, mes, ano)
+
       page.reset_session!
 
       puts "Passo 1: Fazendo o download das urls dos pdf."
@@ -81,6 +107,8 @@ module Jornaleiro
       check "chk_avancada_0"
       fill_in "dt_inicio_leitura_jornais", with: "#{dia}/#{mes}"
       fill_in "dt_fim_leitura_jornais", with: "#{dia}/#{mes}"
+
+      select ano.to_s, :from => "ano_leitura_jornais"
 
       resultado_busca = window_opened_by do
         click_on "BUSCAR"
@@ -102,7 +130,11 @@ module Jornaleiro
         page.execute_script "window.close();"
 
         urls = [pdf_do1, pdf_do2, pdf_do3]
-        begin
+
+        prepara_diretorio_temporario()
+
+        Dir.chdir(@diretorio_temporario) do
+
           puts system('rm *.pdf*')
 
           File.open("pdfs.links", "w+") do |f|
@@ -110,24 +142,29 @@ module Jornaleiro
           end
 
           puts "Passo 2: Baixando pdfs."
-          puts system('cat pdfs.links | parallel --gnu "wget {}"')
+          puts system('cat pdfs.links | parallel --no-notice  --gnu "wget -q {}"')
           if (!pdf_do_extra.nil?)
-            puts system("wget \"#{pdf_do_extra}\"")
+            puts system("wget -q \"#{pdf_do_extra}\"")
           end
         end
+
       end
 
-#      page.switch_to_window(page.windows[0])
-#      page.execute_script "window.close();"
+    rescue Capybara::Poltergeist::TimeoutError
+      puts "TimeoutError."
+      sleep 10
+      retry
     end
 
     def interpreta_arquivo(arquivo)
+#      puts "Interpretando : '#{arquivo}'"
       atributos = Hash.new
 
       partes = arquivo.split('_')
+
       atributos[:ano] = partes[1]
       atributos[:mes] = partes[2]
-      atributos[:dia] = partes[3].chomp(".pdf")
+      atributos[:dia] = partes[3].split('.')[0]
 
       if (partes[4].eql? "Extra.pdf")
         atributos[:pagina] = partes[5]
@@ -142,6 +179,8 @@ module Jornaleiro
         end
       end
 
+#      puts puts atributos
+
       atributos
     end
 
@@ -150,32 +189,27 @@ module Jornaleiro
 
       pgsql = PgSQL.new
 
-      arquivos = Dir.entries(".")
-      arquivos.each { |arquivo|
+      Dir.chdir(@diretorio_temporario) do
 
-        atributos = nil
+        arquivos = Dir.entries('.')
+        arquivos.each { |arquivo|
 
-        dou = arquivo[/\DO\d_(\d)(\d)(\d)(\d)_(\d)(\d)_(\d)(\d).pdf_(\d)*/]
-        if (!dou.nil?)
-          atributos = interpreta_arquivo(dou)
-        end
+          atributos = nil
 
-        dou_extra = arquivo[/\DO\d_(\d)(\d)(\d)(\d)_(\d)(\d)_(\d)(\d)_Extra.pdf_(\d)*/]
-        if (!dou_extra.nil?)
-          atributos = interpreta_arquivo(dou_extra)
-        end
+          if (arquivo.include? '.pdf')
+            atributos = interpreta_arquivo(arquivo)
+          end
 
-        dou_suplemento_anvisa = arquivo[/\DO\d_(\d)(\d)(\d)(\d)_(\d)(\d)_(\d)(\d)_SuplementoAnvisa.pdf_(\d)*/]
-        if (!dou_suplemento_anvisa.nil?)
-          atributos = interpreta_arquivo(dou_suplemento_anvisa)
-        end
+          if (!atributos.nil?)
+            conteudo = File.read(arquivo)
+            pgsql.insere_documento(data, atributos[:pagina], atributos[:sessao], conteudo, nil, nil)
+            print "."
+          else
+            puts "Ignorando arquivo: " + arquivo
+          end
+        }
 
-        if (!atributos.nil?)
-          conteudo = File.read(arquivo)
-          pgsql.insere_documento(data, atributos[:pagina], atributos[:sessao], conteudo, nil, nil)
-          print "."
-        end
-      }
+      end
 
       pgsql.destroy();
 
@@ -192,10 +226,11 @@ module Jornaleiro
 
     def inicia_data(dia, mes, ano, data)
 
-      download(dia, mes)
+      puts "inicia_data DOU"
+      download(dia, mes, ano)
       limpar_arquivos();
       divide_paginas();
-      insere_pgsql(data);
+      insere_bd(data);
 
     rescue Capybara::ElementNotFound => e
       puts e
@@ -203,7 +238,4 @@ module Jornaleiro
     end
 
   end
-
-  JornalDOU.new.inicia();
-
 end

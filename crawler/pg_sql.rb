@@ -1,5 +1,4 @@
 require 'sequel'
-require_relative 'arquivo'
 
 module Jornaleiro
   class PgSQL
@@ -10,6 +9,17 @@ module Jornaleiro
     def limpa_string(conteudo)
       conteudo = conteudo.gsub("\"","'")
       conteudo = conteudo.gsub("'","\\\\'")
+
+      # See String#encode
+      encoding_options = {
+          :invalid           => :replace,  # Replace invalid byte sequences
+          :undef             => :replace,  # Replace anything not defined in ASCII
+          :replace           => '',        # Use a blank for those replacements
+          :universal_newline => true       # Always break lines with \n
+      }
+
+      conteudo.encode!(Encoding.find('UTF-8'), encoding_options)
+
       conteudo
     end
 
@@ -30,49 +40,36 @@ module Jornaleiro
       documentos.insert(:sessao => sessaoId,
                         :pagina => pagina,
                         :data => data,
-                        :texto => conteudo,
-                        :textominusculo => conteudo.downcase,
+                        :textominusculo => conteudo,
                         :titulo => titulo,
                         :url => url)
 
     rescue Exception => e
+        puts "Erro ao inserir no banco de dados !"
+        puts "Data: #{data} pagina: #{pagina}, sessaoId: #{sessaoId} titulo #{titulo} url #{url}"
+
       puts e
+      exit 1;
     end
 
     def obtem_ultima_data(idJornal, ordem)
 
-     minmax = (ordem == :mais_recentes ? "max" : "min")
+     minmax = (ordem == :recentes ? "max" : "min")
 
      sql = "select #{minmax}(data) as data from documento d join sessao s on d.sessao=s.id and s.jornal=#{idJornal} "
 
-     puts sql
-
      resultado = Date.parse(@cliente.fetch(sql).first[:data].to_s)
 
+     puts sql
      puts resultado
+
      resultado
 
     rescue Exception => e
-     puts e
+      puts "Não há nenhuma data no banco de dados."
+     return nil;
     end
 
-
-    def insere(jornal, data)
-      jornal.each { |x|
-        sessaoId = x[0]
-        sessao = x[1]
-        paginas_total = x[2]
-
-        puts "Adicionando ao PostgreSQL #{sessao} (cód. #{sessaoId}) com total de #{paginas_total} páginas"
-
-        arq = Arquivo.new
-
-        for p in 1..paginas_total
-          print "#{p}; "
-          insere_documento(data, p, sessaoId, arq.le(sessao, data, p), nil, nil)
-        end
-      }
-    end
   end
 
 end

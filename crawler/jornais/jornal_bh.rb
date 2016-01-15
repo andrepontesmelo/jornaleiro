@@ -7,10 +7,6 @@ require_relative '../pg_sql'
 require_relative '../capybara_util'
 require_relative '../jornal'
 
-#CapybaraUtil.new.SelecionaMotor(:selenium)
-CapybaraUtil.new.SelecionaMotor(:poltergeist)
-
-Capybara.app_host = Capybara.default_host = 'http://portal6.pbh.gov.br'
 
 module Jornaleiro
 
@@ -18,23 +14,41 @@ module Jornaleiro
 
     include Capybara::DSL
 
+    def initialize
+      super()
+
+      CapybaraUtil.new.SelecionaMotor(:poltergeist)
+      Capybara.app_host = Capybara.default_host = 'http://portal6.pbh.gov.br'
+    end
+
+
+    def data_possivel(data)
+      if (data.sunday? || data.monday?)
+        return false
+      else
+        return true
+      end
+    end
+
     def obtem_codigo_jornal
       2
     end
 
     def inicia_data(dia, mes, ano, data)
+
+      puts "inicia_data BH"
       lista_resultado = obter_conteudo(dia, mes, ano)
 
       if (!lista_resultado.nil?)
-          pgsql = PgSQL.new
+        pgsql = PgSQL.new
 
-          lista_resultado.each_with_index { |artigo, indice|
+        lista_resultado.each_with_index { |artigo, indice|
 
-            pgsql.insere_documento(data, indice, 4, artigo[1], artigo[0], artigo[2])
+          pgsql.insere_documento(data, indice, 4, artigo[1], artigo[0], artigo[2])
 
-          }
-          
-          pgsql.destroy()
+        }
+
+        pgsql.destroy()
       end
     end
 
@@ -46,6 +60,7 @@ module Jornaleiro
       page.reset_session!
 
       visit("/dom/iniciaEdicao.do?method=DomDia&dia=" + dia + "/" + mes + "/" + ano + "&comboAno=" + ano)
+
       find('#imgExtRecTodos').click
 
       artigos = all(:css, ".ChamadaArtigo")
@@ -83,7 +98,6 @@ module Jornaleiro
       puts e.message
     end
 
-    JornalBH.new.inicia
   end
 
 end

@@ -1,3 +1,4 @@
+require 'fileutils'
 require 'capybara/poltergeist'
 require 'rubygems'
 require 'capybara'
@@ -6,22 +7,25 @@ require_relative '../pg_sql'
 require_relative '../capybara_util'
 require_relative '../jornal'
 
-#CapybaraUtil.new.SelecionaMotor(:selenium)
-CapybaraUtil.new.SelecionaMotor(:poltergeist)
-
-
-Capybara.app_host = Capybara.default_host = 'http://jornal.iof.mg.gov.br/jspui/UltimoJornal'
-
 module Jornaleiro
 
-  class JornalMg < Jornal
+  class JornalMG < Jornal
 
     include Capybara::DSL
 
     def initialize
+      super()
+
       @lista_pdfs = Array.new
+      @diretorio_temporario = "/tmp/mg"
 
       @meses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"]
+
+      #CapybaraUtil.new.SelecionaMotor(:selenium)
+      CapybaraUtil.new.SelecionaMotor(:poltergeist)
+
+
+      Capybara.app_host = Capybara.default_host = 'http://jornal.iof.mg.gov.br/jspui/UltimoJornal'
     end
 
     def obtem_codigo_jornal
@@ -36,45 +40,80 @@ module Jornaleiro
       end
     end
 
-    def obtem_sessao(titulo_sessao)
+    def arrumar_encoding(string)
+      URI.unescape(string).force_encoding("UTF-8")
+    end
+
+    def obtem_sessao(titulo_sessao, sessao_id)
+      retorno = {}
+
       noticiario_window = window_opened_by do
         click_on(titulo_sessao)
       end
 
       within_window noticiario_window do
+
         total_paginas = find('#id-div-numero-pagina-corrente').text.split(" ").last.to_i
+        if (total_paginas == 0)
+          total_paginas = 1
+        end
 
-        puts ""
+        puts titulo_sessao + " possui #{total_paginas} páginas:"
 
-        puts titulo_sessao + " possui #{total_paginas} páginas "
-
-        puts total_paginas.to_s + " páginas: "
         for p in 1..total_paginas
           print (p % 10 == 0 ? (p/10) : ".")
 
           fill_in 'input-pagina-destino', :with => p.to_s
           click_on('ok')
 
-          @lista_pdfs.push(find('#framePdf')[:src])
+          arquivo_pdf = find('#framePdf')[:src]
+          arquivo_pdf = arrumar_encoding(arquivo_pdf)
+
+          arquivo_pdf = arquivo_pdf.split('?')[0]
+
+          retorno[:sessao] = arquivo_pdf.split('/').last.split('_').first
+          @lista_pdfs.push(arquivo_pdf)
+
         end
 
         page.execute_script "window.close();"
 
-        total_paginas
+        retorno[:paginas] = total_paginas
       end
+
+      retorno[:sessao_id] = sessao_id
+      retorno
+
+    rescue Capybara::ElementNotFound
+      puts "Pulando " + titulo_sessao
+
+      if page.windows.count > 1
+        within_window noticiario_window do
+          page.execute_script "window.close();"
+        end
+      end
+
+      return nil;
     end
 
+    def jornal_ja_obtido(jornal, sessao_id)
+      jornal.each { |j|
+        if (j[:sessao_id] == sessao_id)
+          return true
+        end
+      }
 
-    def obter_links(dia, mes, ano)
+      false
+    end
 
-	puts ("Obtendo links para dia #{dia} do mes #{mes}, ano #{ano}")
-      
- 	page.reset_session!
-        @lista_pdfs.clear()
+    def obter_links(dia, mes, ano, arquivo_links)
 
+      page.reset_session!
 
-#      //xmlui/handle/123456789/136529
+      @lista_pdfs.clear()
+
       visit('http://jornal.iof.mg.gov.br/jspui/UltimoJornal')
+      puts ''
 
       within("#links-constantes-direita") do
         click_on(ano)
@@ -90,55 +129,125 @@ module Jornaleiro
 
       jornalMg = []
 
-      
-      caderno3 = (ano.to_i < 2015 ? 'caderno3' : 'caderno2')
-      jornalMg.push([3, caderno3, obtem_sessao("Publicações de Terceiros")])
-      jornalMg.push([1, 'noticiario', obtem_sessao("Noticiário")])
-      jornalMg.push([2, 'caderno1', obtem_sessao("Diário do Executiv")])
+      jornalMg.push(obtem_sessao("Noticiário", 1))
+      jornalMg.push(obtem_sessao("Publicações de Terceiros", 3))
+      jornalMg.push(obtem_sessao("Edição Extra", 13))
+      jornalMg.push(obtem_sessao("Diário do Leg", 10))
+      jornalMg.push(obtem_sessao("Diário da Jus", 11))
+      jornalMg.push(obtem_sessao("Diário do Exec", 2))
 
-      puts "Lista dos pdfs:"
-      puts @lista_pdfs
-      puts jornalMg
+      jornalMg.push(obtem_sessao("Anexo", 12))
 
-#      File.delete("/tmp/pdfs.links");
-      File.open("/tmp/pdfs.links", "w+") do |f|
-        @lista_pdfs.each { |element| f.puts(element) }
+      Dir.chdir(@diretorio_temporario) do
+        File.open(arquivo_links, "w+") do |f|
+          @lista_pdfs.each { |element| f.puts(element) }
+        end
       end
 
       jornalMg
 
     rescue Capybara::Poltergeist::TimeoutError
+      puts "TimeoutError."
       sleep 10
       retry
     end
 
-    def transcrever()
-	puts("Transcrevendo links => txt do conteudo do pdf..");
+    def baixar(arquivo_links)
+      puts ""
+      puts("Transcrevendo links => txt do conteudo do pdf..");
 
-      Dir.chdir("/tmp") do
-        puts system(' rm *.transcrito')
-        puts system('rm *.pdf*')
-        puts system('cat pdfs.links | parallel --gnu "wget {}"')
-        puts system('for file in *.pdf*; do pdftotext "$file" "$file.transcrito"; done')
+      puts "Em " + @diretorio_temporario.to_s
+
+      Dir.chdir(@diretorio_temporario) do
+
+        puts "Obtendo pdfs .."
+        linha_comando = "cat #{arquivo_links} | parallel --gnu --no-notice 'wget -q {}'"
+        puts linha_comando
+        system(linha_comando)
+
+        puts system('du -hs')
+
+        puts "Transcrevendo pdfs para txts."
+        system('for file in *.pdf*; do pdftotext -raw "$file" "$file.transcrito"; done')
+
+        puts "Removendo ponto espaço ponto espaço"
+        system('for file in *.transcrito; do sed -i -- "s/. . / /g" "$file"; done')
+
+        puts "Removendo espaços e quebras de linha dos documentos"
+        system('for file in *.transcrito; do tr "\n" " " < "$file"  | tr -s " " >> "$file".limpo; done')
+
+        puts "Removendo hifenização"
+        system('for file in *.limpo; do sed -i -- "s/- //g" "$file"; done')
       end
     end
 
     def inicia_data(dia, mes, ano, data)
 
-      jornalMg = obter_links(dia, mes, ano)
-      transcrever
+      puts "inicia_data MG"
+      prepara_diretorio_temporario
 
-      pgsql = PgSQL.new
-      pgsql.insere(jornalMg, data)
-      pgsql.destroy()
+      arquivo_links = "pdfs.txt"
+
+      jornalMg = obter_links(dia, mes, ano, arquivo_links).compact
+
+      if (jornalMg.length > 0)
+        baixar(arquivo_links)
+
+        insere("mg", jornalMg, data)
+
+      end
 
     rescue Capybara::ElementNotFound => e
       puts e
       puts "Pulando dia " + data
     end
 
+
+    def le(apelido_jornal, sessao, sessao_id, data, pagina)
+      if (sessao_id == 8)
+        sessao = 'Edição-Extra'
+      end
+
+      arquivos = Dir["/tmp/mg/#{sessao}*.limpo"]
+
+      if arquivos.size == 1
+        nome_arquivo = arquivos[0]
+      else
+
+        arquivos = Dir["/tmp/mg/#{sessao}* #{pagina}.pdf.transcrito.limpo"]
+
+        if arquivos.size == 1
+          nome_arquivo = arquivos[0]
+        else
+          puts "Implementar: Dir " + "/tmp/mg/#{sessao}* #{pagina}.pdf.transcrito.limpo"
+          puts "Retornou " + arquivos.size.to_s + " registros. "
+          exit 1
+        end
+      end
+
+      conteudo = File.read(nome_arquivo)
+
+      conteudo
+
+    end
+
+    def insere(apelido_jornal, jornal, data)
+      pgsql = PgSQL.new
+
+      jornal.each { |x|
+
+        sessao_id = x[:sessao_id]
+        sessao = x[:sessao]
+        paginas_total = x[:paginas]
+
+        for p in 1..paginas_total
+          print "."
+          pgsql.insere_documento(data, p, sessao_id, le(apelido_jornal, sessao, sessao_id, data, p), nil, nil)
+        end
+      }
+
+      pgsql.destroy()
+    end
+
   end
-
-  JornalMg.new.inicia
-
 end

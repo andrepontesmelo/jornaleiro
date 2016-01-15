@@ -32,6 +32,8 @@ module Jornaleiro
           6
         when "DO3"
           7
+        when "EDJF1"
+          14
         else
           puts dom
           raise StandardError
@@ -157,7 +159,6 @@ module Jornaleiro
     end
 
     def interpreta_arquivo(arquivo)
-#      puts "Interpretando : '#{arquivo}'"
       atributos = Hash.new
 
       partes = arquivo.split('_')
@@ -166,20 +167,20 @@ module Jornaleiro
       atributos[:mes] = partes[2]
       atributos[:dia] = partes[3].split('.')[0]
 
-      if (partes[4].eql? "Extra.pdf")
-        atributos[:pagina] = partes[5]
-        atributos[:sessao] = 8
-      else
-        if (partes[4].eql? "SuplementoAnvisa.pdf")
+      case partes[4]
+        when 'Extra.pdf'
+          atributos[:pagina] = partes[5]
+          atributos[:sessao] = 8
+        when 'SuplementoAnvisa.pdf'
           atributos[:pagina] = partes[5]
           atributos[:sessao] = 9
+        when 'EDJF1'
+          atributos[:pagina] = partes[4]
+          atributos[:sessao] = 14
         else
           atributos[:pagina] = partes[4]
           atributos[:sessao] = obtem_sessao(partes[0])
-        end
       end
-
-#      puts puts atributos
 
       atributos
     end

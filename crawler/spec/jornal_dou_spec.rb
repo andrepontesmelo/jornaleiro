@@ -14,6 +14,17 @@ module Jornaleiro
       expect(interpretado[:sessao]).to eq 7
     end
 
+    it "deve interpretar um nome de arquivo TRF" do
+      interpretado = j.interpreta_arquivo 'EDJF1_2015_03_19.pdf'
+
+      expect(interpretado[:ano]).to eq '2015'
+      expect(interpretado[:mes]).to eq '03'
+      expect(interpretado[:dia]).to eq '19'
+      expect(interpretado[:pagina]).to be_nil
+      expect(interpretado[:sessao]).to eq 14
+    end
+
+
     it "deve limpar o nome de arquivo pdf" do
       limpo = j.limpar_arquivo('DO1_2016_01_11_SuplementoAnvisa.pdf?arg1=dADPwykoU_69iNuprCpnhA&arg2=1452823633')
 

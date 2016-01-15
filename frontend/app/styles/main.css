@@ -81,3 +81,12 @@ body {
     border-bottom: 0;
   }
 }
+
+.highlightedText {
+    font-weight: bold;
+}
+
+/* in the css file or in a style block */
+.angular-with-newlines {
+    white-space: pre-wrap;
+}

@@ -34,6 +34,11 @@ angular
         controller: 'BuscaCtrl',
         controllerAs: 'busca'
       })
+      .when('/documento/:id', {
+        templateUrl: 'views/documento.html',
+        controller: 'DocumentoCtrl',
+        controllerAs: 'documento'
+      })
       .otherwise({
         redirectTo: '/'
       });

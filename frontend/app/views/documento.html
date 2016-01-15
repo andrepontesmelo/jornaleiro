@@ -1,0 +1,18 @@
+<h1>{{documento.sessao.jornal.nome}}</h1>
+<h2>{{documento.sessao.titulo}} <small>{{documento.data}}</small></h2>
+
+
+<div class="panel-heading"></div>
+<p>página {{documento.pagina}}</p>
+<p><a ng-href="#/documento/{{anterior}}"> Anterior </a></p>
+
+
+<div class="angular-with-newlines">
+  {{documento.texto}}
+</div>
+
+<p><a ng-href="#/documento/{{posterior}}"> Próximo</a></p>
+
+
+
+

@@ -1,5 +1,24 @@
-{{ resultadoBusca }}
+<div class="input-group">
+  <span class="input-group-addon">
+    <span class="glyphicon glyphicon-search"></span>
+  </span>
 
-<div ng-repeat="resultado in resultadoBusca">
-  {{resultado}}
+  <input type="search" ng-model="query" ng-change="change()" placeholder="Pesquise..." class="form-control" >
 </div>
+
+<p>
+  {{resultadoBusca.length}} Resultados.
+</p>
+
+
+
+
+<div ng-repeat="resultado in resultadoBusca" class="panel panel-default">
+    <div class="panel-heading">{{resultado.data}} </div>
+    <div class="panel-body"><p ng-bind-html="highlight(resultado.texto, query)"/></div>
+
+    <p><a ng-href="#/documento/{{resultado.idDocumento}}"> Abrir </a></p>
+
+</div>
+
+</span>

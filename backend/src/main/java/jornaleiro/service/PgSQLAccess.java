@@ -4,17 +4,17 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class MySQLAccess {
-    private static MySQLAccess ourInstance = new MySQLAccess();
+public class PgSQLAccess {
+    private static PgSQLAccess ourInstance = new PgSQLAccess();
 
-    public static MySQLAccess getInstance() {
+    public static PgSQLAccess getInstance() {
         return ourInstance;
     }
 
-    private MySQLAccess() {
+    private PgSQLAccess() {
     }
 
-    private static final String URL = "jdbc:mysql://localhost:3306/jornaleiro";
+    private static final String URL = "jdbc:postgresql://localhost:5432/jornaleiro";
     private static final String USERNAME = "jornaleiro";
     private static final String PASSWORD = "";
 
@@ -23,7 +23,7 @@ public class MySQLAccess {
 
         try {
             try {
-                Class.forName("com.mysql.jdbc.Driver");
+                Class.forName("org.postgresql.Driver");
 
             } catch (ClassNotFoundException e) {
                 return null;

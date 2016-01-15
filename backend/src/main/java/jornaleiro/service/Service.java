@@ -1,6 +1,7 @@
 package jornaleiro.service;
 
 import jornaleiro.dto.ResultadoBuscaXml;
+import jornaleiro.dto.ResultadoDocumentoXml;
 
 public class Service  {
     public ResultadoBuscaXml obtemResultadoBuscaXml(String query) throws Exception
@@ -9,5 +10,9 @@ public class Service  {
 
         resultado.filtrarTexto(query);
         return resultado;
+    }
+
+    public ResultadoDocumentoXml obtemDocumentoXml(int id) throws Exception {
+        return new ResultadoDocumentoXml(id);
     }
 }

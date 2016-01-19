@@ -17,7 +17,11 @@ describe('Controller: BuscaCtrl', function () {
     });
   }));
 
-  it('should attach a list of awesomeThings to the scope', function () {
-    expect(BuscaCtrl.awesomeThings.length).toBe(3);
+  it('deve retirar espaços da query', function () {
+    expect(BuscaCtrl.retirar_espacos("andre pontes")).toBe('andre_pontes');
+  });
+
+  it('deve colocar espaços na query', function () {
+    expect(BuscaCtrl.colocar_espacos("andre_pontes")).toBe('andre pontes');
   });
 });

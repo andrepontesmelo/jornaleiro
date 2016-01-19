@@ -1,24 +1,22 @@
 <div class="input-group">
   <span class="input-group-addon">
-    <span class="glyphicon glyphicon-search"></span>
+    <span ng-class="ocupado ? 'glyphicon glyphicon-hourglass' : 'glyphicon glyphicon-search'"></span>
+
   </span>
 
-  <input type="search" ng-model="query" ng-change="change()" placeholder="Pesquise..." class="form-control" >
+  <input type="search" ng-model="query"  ng-keypress="keypress($event)" placeholder="Pesquise..." class="form-control" >
+
 </div>
 
-<p>
-  {{resultadoBusca.length}} Resultados.
-</p>
 
-
-
+<div ng-show="resultadoBusca">
+  {{resultadoBusca.length}} Resultados em {{tempoDecorrido}}s
+</div>
 
 <div ng-repeat="resultado in resultadoBusca" class="panel panel-default">
-    <div class="panel-heading">{{resultado.data}} </div>
-    <div class="panel-body"><p ng-bind-html="highlight(resultado.texto, query)"/></div>
-
-    <p><a ng-href="#/documento/{{resultado.idDocumento}}"> Abrir </a></p>
-
+    <div class="panel-heading">{{resultado.data}} - {{resultado.dias}} dias atrás. <div class="pull-right">{{resultado.sessao.titulo}} | {{resultado.sessao.jornal.nome}}</div></p> </div>
+    <div class="panel-body"><p ng-bind-html="highlight(resultado.texto, query)"/>
+      <a ng-href="#/documento/{{resultado.idDocumento}}" class="btn btn-primary btn-md pull-right"> Abrir </a>
+    </div>
 </div>
-
 </span>

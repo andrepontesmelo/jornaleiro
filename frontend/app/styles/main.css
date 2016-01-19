@@ -84,6 +84,7 @@ body {
 
 .highlightedText {
     font-weight: bold;
+    background: yellow;
 }
 
 /* in the css file or in a style block */

@@ -6,10 +6,9 @@
 <p>página {{documento.pagina}}</p>
 <p><a ng-href="#/documento/{{anterior}}"> Anterior </a></p>
 
+<div ng-bind-html="highlight(documento.texto, query)"/>
 
-<div class="angular-with-newlines">
-  {{documento.texto}}
-</div>
+{{query}}
 
 <p><a ng-href="#/documento/{{posterior}}"> Próximo</a></p>
 

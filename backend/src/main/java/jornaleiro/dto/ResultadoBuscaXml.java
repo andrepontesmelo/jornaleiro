@@ -11,6 +11,16 @@ public class ResultadoBuscaXml {
     private String query;
     private Vector<ResultadoBusca> resultadoBusca;
 
+    public double getTempoDecorrido() {
+        return tempoDecorrido;
+    }
+
+    public void setTempoDecorrido(double tempoDecorrido) {
+        this.tempoDecorrido = tempoDecorrido;
+    }
+
+    private double tempoDecorrido;
+
     public String getQuery() {
         return query;
     }
@@ -30,7 +40,11 @@ public class ResultadoBuscaXml {
     public ResultadoBuscaXml(String query) throws Exception
     {
         this.query = query;
+
+        long inicio = System.nanoTime();
         this.resultadoBusca = Busca.buscar(query);
+
+        tempoDecorrido = (double) (System.nanoTime() - inicio) / 1000000000.0;
     }
 
     public void filtrarTexto(String query) {

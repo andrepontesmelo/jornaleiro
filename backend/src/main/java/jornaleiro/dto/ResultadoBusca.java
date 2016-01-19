@@ -4,6 +4,7 @@ import com.sun.jersey.api.NotFoundException;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 @XmlRootElement
 public class ResultadoBusca {
@@ -11,8 +12,9 @@ public class ResultadoBusca {
     private int idDocumento;
     private int pagina;
     private String texto;
-    private int sessao;
+    private Sessao sessao;
     private Date data;
+    private long dias;
     private String titulo;
     private String url;
 
@@ -22,6 +24,10 @@ public class ResultadoBusca {
     public int getIdDocumento() {
         return idDocumento;
     }
+
+    public long getDias() { return dias; }
+
+    public void setDias(long dias) { this.dias = dias; }
 
     public void setIdDocumento(int idDocumento) {
         this.idDocumento = idDocumento;
@@ -43,11 +49,11 @@ public class ResultadoBusca {
         this.texto = texto;
     }
 
-    public int getSessao() {
+    public Sessao getSessao() {
         return sessao;
     }
 
-    public void setSessao(int sessao) {
+    public void setSessao(Sessao sessao) {
         this.sessao = sessao;
     }
 
@@ -56,7 +62,9 @@ public class ResultadoBusca {
     }
 
     public void setData(Date data) {
+
         this.data = data;
+        this.dias = TimeUnit.MILLISECONDS.toDays(new Date().getTime() - data.getTime());
     }
 
     public String getTitulo() {
@@ -80,8 +88,8 @@ public class ResultadoBusca {
 
         if (posicao >= 0)
         {
-            int inicio = Math.max(0, posicao - 50);
-            int maximo = Math.min(texto.length(), posicao + 50);
+            int inicio = Math.max(0, posicao - 100);
+            int maximo = Math.min(texto.length(), posicao + 100);
 
             texto = texto.substring(inicio, maximo);
         } else

@@ -38,37 +38,27 @@ public class Busca {
             str.append(parte);
 
             primeiro = false;
-
         }
 
         str.append("') AND textoMinusculo like '%");
         str.append(query);
-        str.append("%' order by data desc LIMIT 20 ");
-
-        PrintWriter out = new PrintWriter("/tmp/filename.txt");
-        out.println(str.toString());
-        out.close();
+        str.append("%' order by data desc LIMIT 40 ");
 
         ResultSet resultado = s.executeQuery(str.toString());
 
         while (resultado.next()) {
             ResultadoBusca novo = new ResultadoBusca();
 
-
             novo.setIdDocumento(resultado.getInt(1));
             novo.setTexto(resultado.getString(2));
-            novo.setSessao(resultado.getInt(3));
+            novo.setSessao(Sessao.obterSessao(resultado.getInt(3)));
             novo.setPagina(resultado.getInt(4));
             novo.setData(resultado.getDate(5));
             novo.setTitulo(resultado.getString(6));
             novo.setUrl(resultado.getString(7));
 
-            novo.setUrl(query);
-
             resultadoBusca.add(novo);
         }
-
-
 
         s.close();
         connection.close();

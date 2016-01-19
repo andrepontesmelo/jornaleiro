@@ -7,22 +7,22 @@ public class ResultadoDocumentoXml {
 
     private int id;
     private Documento documento;
-    private int anterior;
-    private int posterior;
+    private Integer anterior;
+    private Integer posterior;
 
-    public int getPosterior() {
+    public Integer getPosterior() {
         return posterior;
     }
 
-    public void setPosterior(int posterior) {
+    public void setPosterior(Integer posterior) {
         this.posterior = posterior;
     }
 
-    public int getAnterior() {
+    public Integer getAnterior() {
         return anterior;
     }
 
-    public void setAnterior(int anterior) {
+    public void setAnterior(Integer anterior) {
         this.anterior = anterior;
     }
 
@@ -46,7 +46,10 @@ public class ResultadoDocumentoXml {
     {
         this.id = id;
         this.documento = jornaleiro.db.Documento.obter(id);
-        this.posterior = id + 1;
-        this.anterior = id - 1;
+
+        if (documento != null) {
+            setPosterior(jornaleiro.db.Documento.obterId(documento.getData(), documento.getSessao(), documento.getPagina() + 1));
+            setAnterior(jornaleiro.db.Documento.obterId(documento.getData(), documento.getSessao(), documento.getPagina() - 1));
+        }
     }
 }

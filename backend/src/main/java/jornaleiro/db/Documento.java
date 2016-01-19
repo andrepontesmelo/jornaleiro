@@ -6,7 +6,9 @@ import jornaleiro.service.PgSQLAccess;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Date;
 
 public class Documento {
     public static jornaleiro.dto.Documento obter(int id) throws Exception  {
@@ -32,7 +34,7 @@ public class Documento {
             d = new jornaleiro.dto.Documento();
             d.setId(id);
             d.setTexto(resultado.getString(1));
-            d.setSessao(new Sessao());
+            d.setSessao(jornaleiro.db.Sessao.obterSessao(resultado.getInt(2)));
             d.setPagina(resultado.getInt(3));
             d.setData(resultado.getDate(4));
             d.setTitulo(resultado.getString(5));
@@ -49,4 +51,41 @@ public class Documento {
 
         return d;
     }
+
+    public static Integer obterId(Date data, Sessao sessao, int pagina) throws SQLException {
+
+        if (pagina < 0)
+            return null;
+
+        Connection connection = PgSQLAccess.getInstance().getConnection();
+
+        if (connection == null)
+            return null;
+
+        Statement s = connection.createStatement();
+
+        StringBuilder str = new StringBuilder();
+
+        str.append("select id from documento where data='");
+        str.append(data.toString());
+        str.append("' and pagina=");
+        str.append(pagina);
+        str.append(" and sessao=");
+        str.append(sessao.getId());
+
+
+        ResultSet resultado = s.executeQuery(str.toString());
+
+        Integer lido = null;
+
+        if (resultado.next()) {
+          lido = resultado.getInt(1);
+        }
+
+        s.close();
+        connection.close();
+
+        return lido;
+    }
+
 }

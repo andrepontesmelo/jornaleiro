@@ -24,7 +24,5 @@ public class Jornal {
     }
 
     public Jornal() {
-        this.nome = "Diário oficial do estado de Minas Gerais";
-        this.id = 55;
     }
 }

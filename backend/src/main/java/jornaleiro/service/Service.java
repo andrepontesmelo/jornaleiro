@@ -15,4 +15,6 @@ public class Service  {
     public ResultadoDocumentoXml obtemDocumentoXml(int id) throws Exception {
         return new ResultadoDocumentoXml(id);
     }
+
+
 }

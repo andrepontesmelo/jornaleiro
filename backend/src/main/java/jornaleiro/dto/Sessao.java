@@ -34,8 +34,5 @@ public class Sessao {
     }
 
     public Sessao() {
-        id = 11;
-        titulo = "Publicações de Terceiros e Editais de Comarcas";
-        jornal = new Jornal();
     }
 }

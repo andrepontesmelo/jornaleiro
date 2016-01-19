@@ -98,6 +98,14 @@ module Jornaleiro
       end
     end
 
+    def download_alternativo(dia, mes, ano)
+      Capybara.app_host = 'http://pesquisa.in.gov.br/'
+      visit "/imprensa/jsp/visualiza/index.jsp?jornal=1&pagina=1&data=#{dia}/#{mes}/#{ano}"
+
+      within_frame 'visualizador' do
+        puts find('viewer').text
+      end
+    end
 
     def download(dia, mes, ano)
 
@@ -133,7 +141,7 @@ module Jornaleiro
 
         urls = [pdf_do1, pdf_do2, pdf_do3]
 
-        prepara_diretorio_temporario()
+        prepara_diretorio_download()
 
         Dir.chdir(@diretorio_temporario) do
 
@@ -197,9 +205,7 @@ module Jornaleiro
 
           atributos = nil
 
-          if (arquivo.include? '.pdf')
-            atributos = interpreta_arquivo(arquivo)
-          end
+          atributos = interpreta_arquivo(arquivo) if (arquivo.include? '.pdf')
 
           if (!atributos.nil?)
             conteudo = File.read(arquivo)
@@ -208,6 +214,7 @@ module Jornaleiro
           else
             puts "Ignorando arquivo: " + arquivo
           end
+
         }
 
       end

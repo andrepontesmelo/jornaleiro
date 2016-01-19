@@ -10,6 +10,14 @@ module Jornaleiro
       conteudo = conteudo.gsub("\"","'")
       conteudo = conteudo.gsub("'","\\\\'")
 
+      while (conteudo.include? '--') do
+        conteudo = conteudo.gsub('--','-')
+      end
+
+      while (conteudo.include? '..') do
+        conteudo = conteudo.gsub('..','.')
+      end
+
       # See String#encode
       encoding_options = {
           :invalid           => :replace,  # Replace invalid byte sequences

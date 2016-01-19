@@ -9,13 +9,40 @@ module Jornaleiro
       @ordem = :recentes
     end
 
+    def le(apelido_jornal, sessao, sessao_id, data, pagina)
+      if (sessao_id == 8)
+        sessao = 'Edição-Extra'
+      end
+
+      arquivos = Dir["/tmp/#{apelido_jornal}/#{sessao}*.limpo"]
+
+      if arquivos.size == 1
+        nome_arquivo = arquivos[0]
+      else
+
+        arquivos = Dir["/tmp/#{apelido_jornal}/#{sessao}* #{pagina}.pdf.transcrito.limpo"]
+
+        if arquivos.size == 1
+          nome_arquivo = arquivos[0]
+        else
+          puts "Implementar: Dir " + "/tmp/#{apelido_jornal}/#{sessao}* #{pagina}.pdf.transcrito.limpo"
+          puts "Retornou " + arquivos.size.to_s + " registros. "
+          exit 1
+        end
+      end
+
+      conteudo = File.read(nome_arquivo)
+      conteudo
+
+    end
+
     def valida_ordem(ordem)
       if (ordem != :antigos && ordem != :recentes)
         raise StandardError
       end
     end
 
-    def prepara_diretorio_temporario
+    def prepara_diretorio_download
       system(" rm -rf #{@diretorio_temporario} ")
       FileUtils::mkdir_p "#{@diretorio_temporario}"
     end
@@ -47,14 +74,15 @@ module Jornaleiro
         data += incremento
       end
 
-      if (data > Date.today)
-        data = nil
-      end
+      data = nil if (data > Date.today)
 
       data
     end
 
     def obtem_proxima_data(data)
+
+      #return Date.parse('1997-01-16')
+
       if (data.nil?)
         return Date.today
       end
@@ -67,7 +95,8 @@ module Jornaleiro
         puts "Ordem alterada: Pegando antigos!"
 
         data = obtem_ultima_data
-        proxima = obtem_proxima_data_na_ordem(data)
+
+        return (data.nil? ? Date.today : obtem_proxima_data_na_ordem(data))
       end
 
       proxima
@@ -79,7 +108,6 @@ module Jornaleiro
       conexao.destroy
 
       data
-
     end
 
     def inicia()

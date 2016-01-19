@@ -1,4 +1,4 @@
-require_relative 'jornais/jornal_dou_spec'
+require 'spec_helper'
 
 module Jornaleiro
 

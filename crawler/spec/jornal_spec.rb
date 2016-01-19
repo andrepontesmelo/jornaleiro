@@ -1,4 +1,4 @@
-require_relative '../jornal'
+require 'spec_helper'
 
 module Jornaleiro
 
@@ -40,10 +40,9 @@ module Jornaleiro
       ultima_data_obtida = '2014-01-02'
       data_anterior_ultima_obtida = '2014-01-01'
 
-      Jornaleiro::Jornal.any_instance.stub(obtem_ultima_data: Date.parse(ultima_data_obtida))
+      allow_any_instance_of(Jornal).to receive(:obtem_ultima_data).and_return(Date.parse(ultima_data_obtida))
 
       expect(j.obtem_proxima_data(Date.today).to_s).to eq(data_anterior_ultima_obtida)
-
     end
 
   end

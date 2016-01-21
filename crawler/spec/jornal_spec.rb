@@ -2,49 +2,44 @@ require 'spec_helper'
 
 module Jornaleiro
 
-  RSpec.describe ".Jornal" do
+  RSpec.describe ".Journal" do
 
-    let(:j) { Jornal.new }
+    let(:j) { Journal.new }
 
-    it "valida ordem" do
-      expect { j.valida_ordem(:recentes) }.not_to raise_error
-      expect { j.valida_ordem(:antigos) }.not_to raise_error
-      expect { j.valida_ordem(:invalido) }.to raise_error(StandardError)
+    it "should validate order" do
+      expect { j.ensure_valid_order(:new) }.not_to raise_error
+      expect { j.ensure_valid_order(:old) }.not_to raise_error
+      expect { j.ensure_valid_order(:invalid) }.to raise_error(StandardError)
+    end
+
+    it "should fetch new documents first" do
+      expect(j.order).to equal(:new)
+    end
+
+    it "should fetch today's public journal in case of empty database" do
+      expect(j.get_next_date(nil).to_s).to eq(Date.today.to_s)
+    end
+
+    it "should fetch next day in general" do
+      monday = Date.parse('2016-01-04')
+
+      expect(j.get_next_date(monday).to_s).to eq('2016-01-05')
+    end
+
+    it "should skip saturdays and sundays" do
+      friday = Date.parse('2016-01-01')
+
+      expect(j.get_next_date(friday).strftime('%A')).to eq('Monday')
     end
 
 
-    it "deve pegar os recentes primeiro." do
-      expect(j.ordem).to equal(:recentes)
+    it "should grab old journals after grabbing all of the most recent ones" do
+      last_grabbed_date = '2014-01-02'
+      day_before_last_grabbed = '2014-01-01'
+
+      allow_any_instance_of(Journal).to receive(:get_last_date).and_return(Date.parse(last_grabbed_date))
+
+      expect(j.get_next_date(Date.today).to_s).to eq(day_before_last_grabbed)
     end
-
-    it "deve obter o dia de hoje caso banco de dados esteja vazio" do
-      expect(j.obtem_proxima_data(nil).to_s).to eq(Date.today.to_s)
-
-    end
-
-    it "deve obter o dia seguinte sem saltos" do
-      segunda_feira = Date.parse('2016-01-04')
-
-      expect(j.obtem_proxima_data(segunda_feira).to_s).to eq('2016-01-05')
-    end
-
-    it "deve saltar sábidos e domingos" do
-      sexta_feira = Date.parse('2016-01-01')
-
-      expect(j.obtem_proxima_data(sexta_feira).strftime('%A')).to eq('Monday')
-    end
-
-
-    it "deve passar a pegar jornais antigos assim que pegar todos os recentes" do
-
-      ultima_data_obtida = '2014-01-02'
-      data_anterior_ultima_obtida = '2014-01-01'
-
-      allow_any_instance_of(Jornal).to receive(:obtem_ultima_data).and_return(Date.parse(ultima_data_obtida))
-
-      expect(j.obtem_proxima_data(Date.today).to_s).to eq(data_anterior_ultima_obtida)
-    end
-
   end
 end
-

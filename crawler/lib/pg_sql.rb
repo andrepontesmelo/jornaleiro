@@ -3,79 +3,73 @@ require 'sequel'
 module Jornaleiro
   class PgSQL
     def initialize
-      @cliente = Sequel.postgres(:user=>'jornaleiro',:password=>'',:host=>'localhost',:port=>5432)
+      @database = Sequel.postgres(:user => 'jornaleiro', :password => '', :host => 'localhost', :port => 5432)
     end
 
-    def limpa_string(conteudo)
-      conteudo = conteudo.gsub("\"","'")
-      conteudo = conteudo.gsub("'","\\\\'")
+    def clean_string(content)
+      content = content.gsub("\"", "'")
+      content = content.gsub("'", "\\\\'")
 
-      while (conteudo.include? '--') do
-        conteudo = conteudo.gsub('--','-')
-      end
+      content = content.gsub('--', '-') while (content.include? '--')
+      content = content.gsub('..', '.') while (content.include? '..')
 
-      while (conteudo.include? '..') do
-        conteudo = conteudo.gsub('..','.')
-      end
-
-      # See String#encode
       encoding_options = {
-          :invalid           => :replace,  # Replace invalid byte sequences
-          :undef             => :replace,  # Replace anything not defined in ASCII
-          :replace           => '',        # Use a blank for those replacements
-          :universal_newline => true       # Always break lines with \n
+          :invalid => :replace, # Replace invalid byte sequences
+          :undef => :replace, # Replace anything not defined in ASCII
+          :replace => '', # Use a blank for those replacements
+          :universal_newline => true # Always break lines with \n
       }
 
-      conteudo.encode!(Encoding.find('UTF-8'), encoding_options)
+      content.encode!(Encoding.find('UTF-8'), encoding_options)
 
-      conteudo
+      content
     end
 
     def destroy
-      @cliente.disconnect
+      @database.disconnect
     end
 
-    def insere_documento(data, pagina, sessaoId, conteudo, titulo, url)
+    def insert_document(date, page, session_id, content, title = nil, url = nil)
 
-      conteudo = limpa_string(conteudo)
+      content = clean_string(content)
 
-      if (!titulo.nil?)
-        titulo = limpa_string(titulo)
+      if (!title.nil?)
+        title = clean_string(title)
       end
 
-      documentos = @cliente[:documento] # Create a dataset
+      documents = @database[:document] # Create a dataset
 
-      documentos.insert(:sessao => sessaoId,
-                        :pagina => pagina,
-                        :data => data,
-                        :textominusculo => conteudo,
-                        :titulo => titulo,
+      documents.insert(:session => session_id,
+                        :page => page,
+                        :date => date,
+                        :content => content,
+                        :title => title,
                         :url => url)
 
     rescue Exception => e
-        puts "Erro ao inserir no banco de dados !"
-        puts "Data: #{data} pagina: #{pagina}, sessaoId: #{sessaoId} titulo #{titulo} url #{url}"
-
-      puts e
+      puts "#{e} "
+      puts "Date: #{date} page: #{page}, session_id: #{session_id} title #{title} url #{url}"
       exit 1;
     end
 
-    def obtem_ultima_data(idJornal, ordem)
+    def get_last_date(journal_id, order)
 
-     minmax = (ordem == :recentes ? "max" : "min")
+      #return Date.parse('2016-01-19');
 
-     sql = "select #{minmax}(data) as data from documento d join sessao s on d.sessao=s.id and s.jornal=#{idJornal} "
+      minmax = (order == :new ? "max" : "min")
 
-     resultado = Date.parse(@cliente.fetch(sql).first[:data].to_s)
+      sql = "select #{minmax}(date) as date from document d join session s on d.session=s.id and s.journal=#{journal_id} "
 
-     puts sql
-     puts resultado
+      date = Date.parse(@database.fetch(sql).first[:date].to_s)
 
-     resultado
+      puts sql
+      puts date
+
+      date
 
     rescue Exception => e
-      puts "Não há nenhuma data no banco de dados."
-     return nil;
+      puts "The database is empty: #{e.message} #{e}"
+      return nil;
     end
 
   end

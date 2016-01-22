@@ -3,7 +3,7 @@ require 'spec_helper'
 module Jornaleiro
 
   RSpec.describe '.JornalDOU' do
-    let(:j) { JornalDOU.new }
+    let(:j) { JornalDOUFresh.new }
 
     it "should parse a pdf file name" do
       parsed = j.parse_file 'DO3_2016_01_12.pdf?arg1=1eRJ1syC0L4DNPgeptgr7g&arg2=1452826103'

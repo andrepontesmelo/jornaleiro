@@ -41,5 +41,53 @@ module Jornaleiro
 
       expect(j.get_next_date(Date.today).to_s).to eq(day_before_last_grabbed)
     end
+
+    it "should accept any date without date constrains" do
+      last_grabbed_date = '2014-01-02'
+      allow_any_instance_of(Journal).to receive(:get_last_date).and_return(Date.parse(last_grabbed_date))
+      expect(j.within_range?(Date.parse('2001-01-01'))).to be_truthy
+    end
+
+    it "should constraint initial date" do
+      allow_any_instance_of(Journal).to receive(:get_last_date).and_return(Date.parse('2014-01-02'))
+
+      allow_any_instance_of(Journal).to receive(:get_initial_date).and_return(Date.parse('2001-01-02'))
+
+      expect(j.within_range?(Date.parse('2001-01-01'))).to be_falsey
+    end
+
+    it "should accept a valid date with initial date constraint" do
+      allow_any_instance_of(Journal).to receive(:get_last_date).and_return(Date.parse('2014-01-02'))
+
+      allow_any_instance_of(Journal).to receive(:get_initial_date).and_return(Date.parse('2001-01-02'))
+
+      expect(j.within_range?(Date.parse('2001-01-03'))).to be_truthy
+    end
+
+    it "should accept a valid date with max date constraint" do
+      allow_any_instance_of(Journal).to receive(:get_last_date).and_return(Date.parse('2014-01-02'))
+
+      allow_any_instance_of(Journal).to receive(:get_last_date).and_return(Date.parse('2001-01-02'))
+
+      expect(j.within_range?(Date.parse('2001-01-01'))).to be_truthy
+    end
+
+    it "should constraint max date" do
+      allow_any_instance_of(Journal).to receive(:get_last_date).and_return(Date.parse('2014-01-02'))
+
+      allow_any_instance_of(Journal).to receive(:get_last_date).and_return(Date.parse('2001-01-02'))
+
+      expect(j.within_range?(Date.parse('2001-01-03'))).to be_falsey
+    end
+
+    it "should accept a valid date with initial and max date constraint" do
+      allow_any_instance_of(Journal).to receive(:get_last_date).and_return(Date.parse('2014-01-02'))
+
+      allow_any_instance_of(Journal).to receive(:get_initial_date).and_return(Date.parse('2001-01-01'))
+      allow_any_instance_of(Journal).to receive(:get_last_date).and_return(Date.parse('2001-01-02'))
+
+      expect(j.within_range?(Date.parse('2001-01-01'))).to be_truthy
+      expect(j.within_range?(Date.parse('2001-01-02'))).to be_truthy
+    end
   end
 end

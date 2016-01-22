@@ -39,12 +39,12 @@ module Jornaleiro
       Capybara.app_host = Capybara.default_host = HOST
     end
 
-    def fetch_date(day, month, ano, data)
+    def fetch_date(day, month, year, data)
 
       prepare
       puts "fetch_date BH"
 
-      articles = fetch_articles(day, month, ano)
+      articles = fetch_articles(day, month, year)
 
       if (!articles.nil?)
         pgsql = PgSQL.new

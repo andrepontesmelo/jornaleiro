@@ -1,6 +1,6 @@
 require_relative '../lib/journal/journal_bh'
 require_relative '../lib/journal/journal_mg'
-require_relative '../lib/journal/journal_dou'
+require_relative '../lib/journal/journal_dou_fresh'
 require_relative '../lib/journal'
 require_relative '../lib/meta_documents'
 

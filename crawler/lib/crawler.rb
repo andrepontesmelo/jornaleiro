@@ -1,6 +1,6 @@
 require_relative 'journal/journal_bh'
 require_relative 'journal/journal_mg'
-require_relative 'journal/journal_dou'
+require_relative 'journal/journal_dou_proxy'
 
 module Jornaleiro
   class Crawler
@@ -8,9 +8,7 @@ module Jornaleiro
     attr_accessor :journals
 
     def initialize
-      @journals = [Jornaleiro::JornalDOU.new, JournalBH.new, Jornaleiro::JournalMG.new]
-
-
+      @journals = [Jornaleiro::JournalDOUProxy.new, JournalBH.new, Jornaleiro::JournalMG.new]
     end
 
     def start
@@ -19,6 +17,7 @@ module Jornaleiro
       }
     end
   end
+
 
   Crawler.new.start
 end

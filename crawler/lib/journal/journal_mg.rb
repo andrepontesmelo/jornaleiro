@@ -242,13 +242,13 @@ module Jornaleiro
     end
 
 
-    def fetch_date(day, month, ano, data)
+    def fetch_date(day, month, year, data)
       puts 'fetch_date MG'
       prepare
 
       @docs = MetaDocuments.new
       @recovery = {}
-      documents = fetch_meta_documents(day, month, ano)
+      documents = fetch_meta_documents(day, month, year)
       if (!documents.nil?)
         save_links
 

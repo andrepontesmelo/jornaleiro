@@ -38,9 +38,30 @@ module Jornaleiro
 
     def ensure_valid_order(order)
       if (order != :old && order != :new)
+        puts "#{order.to_s} is not a valid order."
         raise StandardError
       end
     end
+
+    def get_initial_date
+      nil
+    end
+
+    def get_last_date
+      nil
+    end
+
+    def within_range?(date)
+      date_accepted = true
+
+      date = Date.parse(date)  #if date.class == String.class
+
+      date_accepted &= date >= get_initial_date unless get_initial_date.nil?
+      date_accepted &= date <= get_max_date unless get_max_date.nil?
+
+      date_accepted
+    end
+
 
     def prepare
       if (defined? @tmp_path)
@@ -100,6 +121,11 @@ module Jornaleiro
       data
     end
 
+    def get_max_date
+      nil
+    end
+
+
     def start
       connection = PgSQL.new
 
@@ -108,15 +134,18 @@ module Jornaleiro
       date = get_last_date
       connection.destroy
 
-      while (date > get_initial_date)
-        date = get_next_date(date)
+      date = get_next_date(date)
 
-        if (date > get_initial_date)
+      while (get_initial_date.nil? || date > get_initial_date)
+
+        if (get_initial_date.nil? || date > get_initial_date)
           day, month, year = parse_date(date)
 
           print " * #{year}-#{month}-#{day} "
           fetch_date(day, month, year, "#{year}-#{month}-#{day}")
         end
+
+        date = get_next_date(date)
       end
 
       puts "Finished journal id #{get_journal_id}"

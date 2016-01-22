@@ -3,7 +3,7 @@ require 'spec_helper'
 module Jornaleiro
 
   RSpec.describe '.JournalDOU' do
-    let(:j) { JornalDOU.new }
+    let(:j) { JornalDOUFresh.new }
 
     it "should skip saturdays and sundays" do
       friday = Date.parse('2016-01-01')

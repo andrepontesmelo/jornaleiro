@@ -3,9 +3,9 @@ package jornaleiro.dto;
 import com.sun.xml.txw2.annotation.XmlElement;
 
 @XmlElement
-public class Jornal {
+public class Journal {
     int id;
-    String nome;
+    String name;
 
     public int getId() {
         return id;
@@ -15,14 +15,14 @@ public class Jornal {
         this.id = id;
     }
 
-    public String getNome() {
-        return nome;
+    public String getName() {
+        return name;
     }
 
-    public void setNome(String nome) {
-        this.nome = nome;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public Jornal() {
+    public Journal() {
     }
 }

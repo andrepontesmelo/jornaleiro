@@ -1,20 +1,18 @@
 package jornaleiro.service;
 
-import jornaleiro.dto.ResultadoBuscaXml;
-import jornaleiro.dto.ResultadoDocumentoXml;
+import jornaleiro.dto.SearchResultXml;
+import jornaleiro.dto.DocumentXml;
 
 public class Service  {
-    public ResultadoBuscaXml obtemResultadoBuscaXml(String query) throws Exception
+    public SearchResultXml getSearchResultXml(String query) throws Exception
     {
-        ResultadoBuscaXml resultado = new ResultadoBuscaXml(query);
+        SearchResultXml result = new SearchResultXml(query);
 
-        resultado.filtrarTexto(query);
-        return resultado;
+        result.filter(query);
+        return result;
     }
 
-    public ResultadoDocumentoXml obtemDocumentoXml(int id) throws Exception {
-        return new ResultadoDocumentoXml(id);
+    public DocumentXml getDocumentXml(int id) throws Exception {
+        return new DocumentXml(id);
     }
-
-
 }

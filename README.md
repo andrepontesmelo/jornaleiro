@@ -1,16 +1,27 @@
-# O que é
+Jornaleiro é uma máquina de busca de código aberto para jornais oficiais brasileiros.
 
-Jornaleiro é uma máquina de busca de diários oficiais brasileiros.
+## Objetivo
 
-# Entidades
+Implementar o princípio da publicidade, facilitando o acesso à informação
+veiculada em jornais oficiais brasileiros.
 
- * **Jornal:** Representa um jornal oficinal, pode ser o da união, dos estados ou municipal.  
- * **Sessão:** Um jornal têm várias sessões. É uma subdivisão do jornal.
- * **Documento:** Representa uma página de um documento de um dia de uma sessão de um jornal. Nem todo jornal tem o conceito de *página*.  
- * **Termo:** Cada usuário possui uma lista de termos de interesse.
+### Para cientistas da computação
+ - Possibilitar pesquisa e desenvolvimento em
+ *information retrieval*, construção de taxonomia no domínio de
+ jornais oficiais e benchmark de soluções *full-text search*.
 
-# Tecnologias
+## Camadas
 
- * **backend** Backend em Java para métodos REST.
- * **frontend** Aplicação AngularJS criado com yeoman para buscas síncronas.
- * **crawler** Aplicação Ruby com Capybara e PhantomJS para obtenção dos jornais oficiais.
+ - **backend**
+  - Java + PostgreSQL
+  - Elasticsearch
+ - **frontend**
+  - AngularJS
+  - Android
+ - **crawler** via Capybara e PhantomJS - Ruby.
+
+## Telas
+
+Interface AngularJS via yeoman.
+
+![Alt text](https://raw.githubusercontent.com/andrepontesmelo/jornaleiro/screenshots/screenshots/angularjs.png "Interface angularjs")

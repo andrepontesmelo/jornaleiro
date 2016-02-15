@@ -19,8 +19,10 @@ public class Journal {
             hashJournal = new HashMap<Integer, jornaleiro.dto.Journal>();
             List<jornaleiro.dto.Journal> journals = getAll();
 
-            for (jornaleiro.dto.Journal j : journals) {
-                hashJournal.put(j.getId(), j);
+            if (journals != null) {
+                for (jornaleiro.dto.Journal j : journals) {
+                    hashJournal.put(j.getId(), j);
+                }
             }
         }
 
@@ -29,7 +31,7 @@ public class Journal {
 
     private static List<jornaleiro.dto.Journal> getAll() throws Exception  {
 
-        List<jornaleiro.dto.Journal> jornais = new LinkedList<jornaleiro.dto.Journal>();
+        List<jornaleiro.dto.Journal> journals = new LinkedList<jornaleiro.dto.Journal>();
 
         Connection connection = PgSQLAccess.getInstance().getConnection();
 
@@ -48,12 +50,12 @@ public class Journal {
             journal.setId(resultSet.getInt(1));
             journal.setName(resultSet.getString(2));
 
-            jornais.add(journal);
+            journals.add(journal);
         }
 
         s.close();
         connection.close();
 
-        return jornais;
+        return journals;
     }
 }

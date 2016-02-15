@@ -21,19 +21,19 @@ public class Document {
 
         String str = "select content, session, page, date, title, url from document where id = " + id;
 
-        ResultSet resultado = s.executeQuery(str);
+        ResultSet result = s.executeQuery(str);
 
         jornaleiro.dto.Document d = new jornaleiro.dto.Document();
 
-        if (resultado.next()) {
+        if (result.next()) {
 
             d.setId(id);
-            d.setContent(resultado.getString(1));
-            d.setSession(jornaleiro.db.Session.getSession(resultado.getInt(2)));
-            d.setPage(resultado.getInt(3));
-            d.setDate(resultado.getDate(4));
-            d.setTitle(resultado.getString(5));
-            d.setUrl(resultado.getString(6));
+            d.setContent(result.getString(1));
+            d.setSession(jornaleiro.db.Session.getSession(result.getInt(2)));
+            d.setPage(result.getInt(3));
+            d.setDate(result.getDate(4));
+            d.setTitle(result.getString(5));
+            d.setUrl(result.getString(6));
         }
 
         s.close();

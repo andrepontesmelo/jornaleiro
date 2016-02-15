@@ -1,34 +1,29 @@
-# O que é
+# About
 
-Jornaleiro é uma máquina de busca de diários oficiais brasileiros.
+Jornaleiro is a search engine of Brazilian official gazettes also known as public journals.
 
-Este é o backend Java que faz um papel de fachada para várias plataformas cliente (iOS/Android/AngularJS). O usuário pode através deste serviço informar os *termos* de interesse e realizar buscas síncronas ou assíncronas. O resultado de busca contém os *snippets* de texto que contém os termos de interesse, além de ponteiros para os documentos relevantes.
+This is the Java backend that makes a facade for currently Android mobile app and AngularJS+Bootstrap web interface.
 
-# O que não é
+## Entities
 
-Para as buscas assíncronas sejam possíveis, é necessário uma aplicação (console ou serviço do sistema operacional) que opere como produtor-consumidor, lendo os termos de interesse e produzindo resultados de busca. Este processamento não é feito aqui.
+  * ** Journal: **  Can be the country level, state level or municipal.
+  * ** Session: ** A journal have multiple sessions. It is a subdivision of the journal.
+  * ** Document: ** Represents a document *or a page* within one session.
+  * ** Search: ** The query can be single word or a phrase.
 
-# Entidades
+# API
 
- * **Jornal:** Representa um jornal oficinal, pode ser o da união, dos estados ou municipal.  
- * **Sessão:** Um jornal têm várias sessões. É uma subdivisão do jornal.
- * **Documento:** Representa uma página de um documento de um dia de uma sessão de um jornal. Nem todo jornal tem o conceito de *página*.  
- * **Termo:** Cada usuário possui uma lista de termos de interesse.
+Currently, only GET operations are allowed.
+All of them are designed to be safe and idempotent.
+This means that any call will not cause any side effects (safe). And the effect of a single call is the same of several calls (idempotent). One benefit of this is that clients or intermediates, like proxy servers can cache results.
 
-# Rest - métodos genéricos
+One specific aspect of journals is the fact that a document never expires, since it never changes since it's release. It's different from generic search engines that needs to measure the freshness of collected data.
+
+## Call examples
 
 ```
-GET /jornal
-GET /sessao
-GET /documento/1234
-GET /busca/exemplo_de_palavras_chaves
-```
-
-# Rest - Termos e resultado  
-
-Cada usuário é indetificado por um uuid que pode ser gerado pela aplicação cliente. Não é necessário autenticação ou login. Protocolo https é utilizado para transmissão de dados criptografados.
-```
-[ GET | PUT ] /usuario/uuid/termo
-GET /usuario/uuid/termo/Exemplo_Termo/resultado
-GET /usuario/uuid/resultado
+GET /journal
+GET /session
+GET /document/1234
+GET /search/my_phrase_or_word
 ```

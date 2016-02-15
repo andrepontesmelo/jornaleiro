@@ -30,7 +30,7 @@ SET search_path = public, pg_catalog;
 --
 
 CREATE SEQUENCE documento_id_seq
-    START WITH 558405
+    START WITH 320368
     INCREMENT BY 1
     NO MINVALUE
     MAXVALUE 2147483648
@@ -44,53 +44,84 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
--- Name: documento; Type: TABLE; Schema: public; Owner: jornaleiro; Tablespace: 
+-- Name: document; Type: TABLE; Schema: public; Owner: jornaleiro; Tablespace: 
 --
 
-CREATE TABLE documento (
+CREATE TABLE document (
     id integer DEFAULT nextval('documento_id_seq'::regclass) NOT NULL,
-    texto character varying(5592405),
-    sessao integer,
-    pagina integer,
-    data timestamp without time zone,
-    titulo character varying(400),
+    session integer,
+    page integer,
+    date timestamp without time zone,
+    title character varying(400),
     url character varying(200),
-    textominusculo text
+    content text
 );
 
 
-ALTER TABLE documento OWNER TO jornaleiro;
+ALTER TABLE document OWNER TO jornaleiro;
 
 --
--- Name: jornal; Type: TABLE; Schema: public; Owner: jornaleiro; Tablespace: 
+-- Name: journal; Type: TABLE; Schema: public; Owner: jornaleiro; Tablespace: 
 --
 
-CREATE TABLE jornal (
-    id integer,
-    nome character varying(45)
+CREATE TABLE journal (
+    id integer NOT NULL,
+    name character varying(45)
 );
 
 
-ALTER TABLE jornal OWNER TO jornaleiro;
+ALTER TABLE journal OWNER TO jornaleiro;
 
 --
--- Name: sessao; Type: TABLE; Schema: public; Owner: jornaleiro; Tablespace: 
+-- Name: session; Type: TABLE; Schema: public; Owner: jornaleiro; Tablespace: 
 --
 
-CREATE TABLE sessao (
-    id integer,
-    titulo character varying(50),
-    jornal integer
+CREATE TABLE session (
+    id integer NOT NULL,
+    title character varying(50),
+    journal integer
 );
 
 
-ALTER TABLE sessao OWNER TO jornaleiro;
+ALTER TABLE session OWNER TO jornaleiro;
+
+--
+-- Name: documento_data_sessao_pagina; Type: CONSTRAINT; Schema: public; Owner: jornaleiro; Tablespace: 
+--
+
+ALTER TABLE ONLY document
+    ADD CONSTRAINT documento_data_sessao_pagina UNIQUE (date, session, page);
+
+
+--
+-- Name: documento_pkey; Type: CONSTRAINT; Schema: public; Owner: jornaleiro; Tablespace: 
+--
+
+ALTER TABLE ONLY document
+    ADD CONSTRAINT documento_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: jornal_pkey; Type: CONSTRAINT; Schema: public; Owner: jornaleiro; Tablespace: 
+--
+
+ALTER TABLE ONLY journal
+    ADD CONSTRAINT jornal_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: sessao_pkey; Type: CONSTRAINT; Schema: public; Owner: jornaleiro; Tablespace: 
+--
+
+ALTER TABLE ONLY session
+    ADD CONSTRAINT sessao_pkey PRIMARY KEY (id);
+
 
 --
 -- Name: texto_fulltext_idx; Type: INDEX; Schema: public; Owner: jornaleiro; Tablespace: 
 --
 
-CREATE INDEX texto_fulltext_idx ON documento USING gin (to_tsvector('portuguese'::regconfig, textominusculo));
+CREATE INDEX texto_fulltext_idx ON document USING gin (to_tsvector('portuguese'::regconfig, content));
 
 
 --

@@ -30,14 +30,14 @@ angular
         controllerAs: 'about'
       })
       .when('/busca', {
-        templateUrl: 'views/busca.html',
-        controller: 'BuscaCtrl',
-        controllerAs: 'busca'
+        templateUrl: 'views/search.html',
+        controller: 'SearchCtrl',
+        controllerAs: 'search'
       })
       .when('/documento/:id', {
-        templateUrl: 'views/documento.html',
-        controller: 'DocumentoCtrl',
-        controllerAs: 'documento'
+        templateUrl: 'views/document.html',
+        controller: 'DocumentCtrl',
+        controllerAs: 'document'
       })
       .otherwise({
         redirectTo: '/'

@@ -1,0 +1,17 @@
+<h1>{{document.session.jornal.name}}</h1>
+<h2>{{document.session.title}} <small>{{document.data}}</small></h2>
+
+
+<div class="panel-heading"></div>
+<p>página {{document.page}}</p>
+<p><a ng-href="#/documento/{{before}}"> Anterior </a></p>
+
+<div ng-bind-html="highlight(document.content, query)"/>
+
+{{query}}
+
+<p><a ng-href="#/documento/{{after}}"> Próximo</a></p>
+
+
+
+

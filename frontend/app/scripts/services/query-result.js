@@ -2,15 +2,15 @@
 
 /**
  * @ngdoc service
- * @name frontendApp.dadosBusca
+ * @name frontendApp.queryResult
  * @description
- * # dadosBusca
+ * # queryResult
  * Service in the frontendApp.
  */
 angular.module('frontendApp')
-  .service('dadosBusca', function () {
+  .service('queryResult', function () {
     var query = '';
-    var resultadoBusca = [];
+    var result = [];
 
     return {
         getQuery: function () {
@@ -19,11 +19,11 @@ angular.module('frontendApp')
         setQuery: function(value) {
             query = value;
         },
-        getResultadoBusca: function() {
-          return resultadoBusca;
+        getResult: function() {
+          return result;
           },
-        setResultadoBusca: function(value) {
-          resultadoBusca = value;
+        setResult: function(value) {
+          result = value;
         }
     };
   });

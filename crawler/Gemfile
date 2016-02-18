@@ -9,6 +9,7 @@ gem 'test-unit'
 gem 'pg'
 gem 'fileutils'
 gem 'rmagick'
+gem 'unicode'
 
 group :development do
   gem 'guard'

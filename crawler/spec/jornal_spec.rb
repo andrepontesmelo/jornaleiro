@@ -101,5 +101,18 @@ module Jornaleiro
       expect(j.within_range?(Date.parse('2001-01-01'))).to be_truthy
       expect(j.within_range?(Date.parse('2001-01-02'))).to be_truthy
     end
+
+    it 'should detect when all possible dates are grabbed' do
+      allow_any_instance_of(Journal).to receive(:last_fetched_date).and_return(
+        Date.parse('2014-01-02'))
+
+      allow_any_instance_of(Journal).to receive(:initial_date).and_return(
+        Date.parse('2014-01-02'))
+
+      allow_any_instance_of(Journal).to receive(:max_date).and_return(
+        Date.parse('2014-01-02'))
+
+      expect(j.next_date(Date.parse('2014-01-02'))).to be_nil
+    end
   end
 end

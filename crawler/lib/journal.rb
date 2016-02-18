@@ -61,8 +61,8 @@ module Jornaleiro
       end
     end
 
-    def valid_date?(data)
-      !data.sunday? && !data.saturday?
+    def valid_date?(date)
+      !date.sunday? && !date.saturday?
     end
 
     def parse_date(date)
@@ -85,34 +85,36 @@ module Jornaleiro
       date
     end
 
-    def next_date(data)
-      return Date.today if data.nil?
+    def next_date(date)
+      return Date.today if date.nil?
 
-      next_date = next_date_same_order(data)
+      next_date = next_date_same_order(date)
 
-      if next_date.nil?
-
+      if next_date.nil? && @order == :new
         @order = :old
         puts 'Order changed: Fetching old ones.'
 
-        data = last_fetched_date
+        date = last_fetched_date
 
-        return (data.nil? ? Date.today : next_date_same_order(data))
+        next_date = (date.nil? ? Date.today : next_date_same_order(date))
       end
 
-      next_date
+      return next_date if within_range?(next_date)
+
+      nil
     end
 
     def last_fetched_date
       connection = PgSQL.new
-      data = connection.last_fetched_date(journal_id, @order)
+      date = connection.last_fetched_date(journal_id, @order)
       connection.destroy
 
-      data
+      date
     end
 
     def should_fetch
       return true if last_fetched_date.nil?
+      return true if initial_date.nil?
       last_fetched_date > initial_date
     end
 

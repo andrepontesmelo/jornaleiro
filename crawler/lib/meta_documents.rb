@@ -1,5 +1,5 @@
 module Jornaleiro
-
+  # information about a session of documents to be retrieved
   class MetaDocument
     attr_accessor :session_id, :session, :page_count, :links
 
@@ -9,6 +9,7 @@ module Jornaleiro
     end
   end
 
+  # Dictionary of meta documents.
   class MetaDocuments
     attr_accessor :docs
 
@@ -17,33 +18,29 @@ module Jornaleiro
     end
 
     def push(meta_document)
-
       key = meta_document.session_id
-
-      raise ArgumentError if (@docs.has_key? key)
-
+      raise ArgumentError if @docs.key? key
       @docs[key] = meta_document
     end
 
-    def has_session?(sessao_id)
-      @docs.has_key? sessao_id
+    def session?(sessao_id)
+      @docs.key? sessao_id
     end
 
-    def get_document(sessao_id)
+    def document(sessao_id)
       @docs[sessao_id]
     end
 
-    def get_documents
+    def documents
       @docs.values
     end
 
     def merge_links
-
       merge = []
 
-      @docs.values.each { |d|
-        merge += (d.links)
-      }
+      @docs.values.each do |d|
+        merge += d.links
+      end
 
       merge
     end

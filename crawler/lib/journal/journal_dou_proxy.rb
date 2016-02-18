@@ -9,7 +9,7 @@ require_relative '../journal/journal_dou_fresh'
 require_relative '../capybara_util'
 
 module Jornaleiro
-
+  # Forward requests to either fresh or archive DOU crawlers.
   class JournalDOUProxy < JournalDOU
     include Capybara::DSL
 

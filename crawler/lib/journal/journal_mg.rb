@@ -7,24 +7,23 @@ require_relative '../pg_sql'
 require_relative '../capybara_util'
 require_relative '../journal'
 require_relative '../meta_documents'
+require_relative '../bash_tools'
 
 module Jornaleiro
-
+  # Crawler for Minas Gerais state level public journal.
   class JournalMG < Journal
-
     include Capybara::DSL
-
-    LINKS_FILE = 'pdfs.txt'
-    JOURNAL_SHORT_NAME = 'mg'
+    LINKS_FILE = 'pdfs.txt'.freeze
+    JOURNAL_SHORT_NAME = 'mg'.freeze
 
     # Title for each session
-    TITLE_NOTICIARIO = 'Noticiário'
-    TITLE_TERCEIROS = 'Publicações de Terceiros'
-    TITLE_EXTRA = 'Edição Extra'
-    TITLE_LEG = 'Diário do Leg'
-    TITLE_JUS = 'Diário da Jus'
-    TITLE_EXEC = 'Diário do Exec'
-    TITLE_ANEXO = 'Anexo'
+    TITLE_NOTICIARIO = 'Noticiário'.freeze
+    TITLE_TERCEIROS = 'Publicações de Terceiros'.freeze
+    TITLE_EXTRA = 'Edição Extra'.freeze
+    TITLE_LEG = 'Diário do Leg'.freeze
+    TITLE_JUS = 'Diário da Jus'.freeze
+    TITLE_EXEC = 'Diário do Exec'.freeze
+    TITLE_ANEXO = 'Anexo'.freeze
 
     # Database id for each session
     SESSION_NOTICIARIO = 1
@@ -35,25 +34,25 @@ module Jornaleiro
     SESSION_EXEC = 2
     SESSION_ANEXO = 12
 
-    HOST = 'http://jornal.iof.mg.gov.br/jspui/UltimoJornal'
-    
+    HOST = 'http://jornal.iof.mg.gov.br/jspui/UltimoJornal'.freeze
     def initialize
       super()
 
       @recovery = {}
       @docs = MetaDocuments.new
       @tmp_path = "/tmp/#{JOURNAL_SHORT_NAME}"
+      @bash_tools = BashTools.new(@tmp_path)
 
-      @months = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-                 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro']
+      @months = %w(Janeiro Fevereiro Março Abril Maio Junho Julho \\
+                   Agosto Setembro Outubro Novembro Dezembro)
     end
 
-    def get_journal_id
+    def journal_id
       1
     end
 
-    def get_initial_date
-      Date.parse('2005-07-01')
+    def initial_date
+      Date.parse('1996-10-04')
     end
 
     def valid_date?(data)
@@ -61,57 +60,64 @@ module Jornaleiro
     end
 
     def fix_encoding(string)
-      URI.unescape(string).force_encoding("UTF-8")
+      URI.unescape(string).force_encoding('UTF-8')
     end
 
-    def hash(sessao_id, page)
-      "#{sessao_id}_#{page}"
+    def hash(session_id, page)
+      "#{session_id}_#{page}"
     end
 
-    def get_session(session_title, session_id)
+    def fetch_page(session_id, p, meta)
+      sleep 2
+      recovered = @recovery[hash(session_id, p)]
+      if recovered.nil?
+
+        print(p % 10 == 0 ? (p / 10) : '.')
+
+        fill_in 'input-pagina-destino', :with => p.to_s
+        sleep 1
+        click_on('ok')
+        sleep 1
+
+        file_pdf = find('#framePdf')[:src]
+        file_pdf = fix_encoding(file_pdf)
+        file_pdf = file_pdf.split('?')[0]
+
+        recovered = [file_pdf, file_pdf.split('/').last.split('_').first]
+        @recovery[hash(session_id, p)] = recovered
+      else
+        puts "Recovered: page #{p} of session #{session_id}. "
+      end
+
+      meta.links.push(recovered[0])
+      meta.session = recovered[1]
+    end
+
+    def page_count(session_id)
+      pages = find('#id-div-numero-pagina-corrente').text.split(' ').last.to_i
+      pages = 1 if pages == 0 || pages == 200 || session_id == SESSION_ANEXO
+
+      pages
+    end
+
+    def fetch_session(session_title, session_id)
       meta = MetaDocument.new(session_id)
 
       opened_window = window_opened_by do
         click_on(session_title)
       end
 
+      puts "Session id is #{session_id}"
       within_window opened_window do
         sleep 5
-        page_count = find('#id-div-numero-pagina-corrente').text.split(' ').last.to_i
-        if (page_count == 0 || page_count == 200 || session_id == SESSION_ANEXO)
-          page_count = 1
-        end
+        meta.page_count = page_count(session_id)
+        puts "Session #{session_title} has #{meta.page_count} page(s)."
 
-        puts "Session #{session_title} has #{page_count} page(s)."
-
-        for p in 1..page_count
-          sleep 2
-          recovered = @recovery[hash(session_id, p)]
-          if (recovered.nil?)
-
-            print (p % 10 == 0 ? (p/10) : ".")
-
-            fill_in 'input-pagina-destino', :with => p.to_s
-            sleep 1
-            click_on('ok')
-            sleep 1
-
-            arquivo_pdf = find('#framePdf')[:src]
-            arquivo_pdf = fix_encoding(arquivo_pdf)
-            arquivo_pdf = arquivo_pdf.split('?')[0]
-
-            recovered = [arquivo_pdf, arquivo_pdf.split('/').last.split('_').first]
-            @recovery[hash(session_id, p)] = recovered;
-          else
-            puts "Recovered: page #{p} of session #{session_id}. "
-          end
-
-          meta.links.push(recovered[0])
-          meta.session = recovered[1]
+        for p in 1..meta.page_count
+          fetch_page(session_id, p, meta)
         end
 
         page.execute_script 'window.close();'
-        meta.page_count = page_count
       end
 
       meta
@@ -119,22 +125,43 @@ module Jornaleiro
     rescue Capybara::ElementNotFound => e
       print "\nSkipping '#{session_title}' - #{e.message} "
 
-      if page.windows.count > 1
-        within_window opened_window do
-          page.execute_script "window.close();"
-        end
+      if page.windows.count > 1 
+        within_window opened_window { close_window }
       end
 
-      if (e.message.include? 'framePdf')
-        raise StandardError
-      else
-        puts ' - Will not try again.'
-        return meta;
-      end
+      raise StandardError if e.message.include? 'framePdf'
+      puts ' - Will not try again.'
+      return meta
+    end
+
+    def close_window
+      page.execute_script 'window.close();'
+    end
+
+    def fetch_sessions
+      @docs.push(fetch_session(TITLE_TERCEIROS, SESSION_TERCEIROS)) unless
+       @docs.session?(SESSION_TERCEIROS)
+
+      @docs.push(fetch_session(TITLE_NOTICIARIO, SESSION_NOTICIARIO)) unless
+       @docs.session?(SESSION_NOTICIARIO)
+
+      @docs.push(fetch_session(TITLE_EXTRA, SESSION_EXTRA)) unless
+       @docs.session?(SESSION_EXTRA)
+
+      @docs.push(fetch_session(TITLE_LEG, SESSION_LEG)) unless
+       @docs.session?(SESSION_LEG)
+
+      @docs.push(fetch_session(TITLE_JUS, SESSION_JUS)) unless
+       @docs.session?(SESSION_JUS)
+
+      @docs.push(fetch_session(TITLE_EXEC, SESSION_EXEC)) unless
+       @docs.session?(SESSION_EXEC)
+
+      @docs.push(fetch_session(TITLE_ANEXO, SESSION_ANEXO)) unless
+       @docs.session?(SESSION_ANEXO)
     end
 
     def fetch_meta_documents(day, month, year)
-
       page.reset_session!
       visit('http://jornal.iof.mg.gov.br/jspui/UltimoJornal')
 
@@ -142,105 +169,65 @@ module Jornaleiro
         click_on(year)
       end
 
-      click_on(@months[month.to_i - 1])
+      click_on(@months[month - 1])
 
       within('#id-lista-subcomunidades') do
         link_dia = page.find_link(day.to_s)
         link_dia.click
       end
 
-      @docs.push(get_session(TITLE_TERCEIROS, SESSION_TERCEIROS)) unless @docs.has_session?(SESSION_TERCEIROS)
-
-      @docs.push(get_session(TITLE_NOTICIARIO, SESSION_NOTICIARIO)) unless @docs.has_session?(SESSION_NOTICIARIO)
-
-      @docs.push(get_session(TITLE_EXTRA, SESSION_EXTRA)) unless @docs.has_session?(SESSION_EXTRA)
-
-      @docs.push(get_session(TITLE_LEG, SESSION_LEG)) unless @docs.has_session?(SESSION_LEG)
-
-      @docs.push(get_session(TITLE_JUS, SESSION_JUS)) unless @docs.has_session?(SESSION_JUS)
-
-      @docs.push(get_session(TITLE_EXEC, SESSION_EXEC)) unless @docs.has_session?(SESSION_EXEC)
-
-      @docs.push(get_session(TITLE_ANEXO, SESSION_ANEXO)) unless @docs.has_session?(SESSION_ANEXO)
+      fetch_sessions
 
       @docs
-
     rescue Capybara::Poltergeist::TimeoutError, StandardError => e
-      if (!e.message.eql?("Unable to find link \"#{day.to_s}\""))
-
+      if e.message.eql?("Unable to find link \"#{day}\"")
+        puts "The is no public journal @ #{day}."
+        return nil
+      else
         puts e.message
         sleep 10
         retry
-      else
-        puts "The is no public journal @ #{day.to_s}."
-        return nil;
       end
     end
 
     def prepare
       super
 
-      CapybaraUtil.new.set_driver :poltergeist
+      CapybaraUtil.new.use_poltergeist
       Capybara.app_host = HOST
     end
 
-    def download_pdfs
+    def save_links(file)
       Dir.chdir(@tmp_path) do
-
-        puts 'downloading pdfs ..'
-        command_line = "cat #{LINKS_FILE} | parallel  --gnu --no-notice 'wget -q {}'"
-        puts command_line
-        system(command_line)
-
-        puts system('du -hs')
-
-        puts 'Transcribing pdf to text '
-        system('for file in *.pdf*; do pdftotext -raw "$file" "$file.transcrito"; done')
-
-        puts "Removing common '. ' sequences "
-        system('for file in *.transcrito; do sed -i -- "s/. . / /g" "$file"; done')
-
-        puts 'Shrinking empty spaces and removing line breaks'
-        system('for file in *.transcrito; do tr "\n" " " < "$file"  | tr -s " " >> "$file".limpo; done')
-
-        puts 'Removing hyphenation'
-        system('for file in *.limpo; do sed -i -- "s/- //g" "$file"; done')
-      end
-    end
-
-    def save_links
-      Dir.chdir(@tmp_path) do
-        File.open(LINKS_FILE, 'w+') do |f|
+        File.open(file, 'w+') do |f|
           @docs.merge_links.each { |element| f.puts(element) }
         end
       end
     end
 
-    def insert(documents, date)
-      pgsql = PgSQL.new
+    def insert_document(document, date, pgsql)
+      session_id = document.session_id
+      session = document.session
+      
+      puts "Inserting #{document.page_count} documents within session #{session}."
 
-      documents.get_documents.each { |document|
-
-        if (!document.page_count.nil?)
-
-          session_id = document.session_id
-          session = document.session
-          page_count = document.page_count
-
-          puts "Inserting #{page_count} documents within session #{session}."
-
-          for p in 1..page_count
-            print '.'
-            pgsql.insert_document(date, p, session_id, read_file(JOURNAL_SHORT_NAME, session, session_id, p))
-          end
-
-          puts ''
-        end
-      }
-
-      pgsql.destroy()
+      for p in 1..document.page_count do
+        print '.'
+        content = read_file(session, session_id, p)
+        pgsql.insert_document(date, p, session_id, content)
+      end
     end
 
+    def insert(documents, date)
+      pgsql = PgSQL.new
+      documents.documents.each do |document|
+        next if document.page_count.nil?
+        insert_document(document, date, pgsql)
+        puts
+      end
+
+      pgsql.destroy
+    end
 
     def fetch_date(day, month, year, data)
       puts 'fetch_date MG'
@@ -249,18 +236,16 @@ module Jornaleiro
       @docs = MetaDocuments.new
       @recovery = {}
       documents = fetch_meta_documents(day, month, year)
-      if (!documents.nil?)
-        save_links
+      unless documents.nil?
+        save_links(LINKS_FILE)
 
-        download_pdfs() if (documents.merge_links.length > 0)
+        @bash_tools.crawle_pdfs(LINKS_FILE) unless documents.merge_links.empty?
 
         insert(documents, data)
       end
-
     end
 
   rescue Capybara::ElementNotFound => e
-    puts "Skipping date #{data} due to unrecovery error #{e}"
+    puts "Skipping date #{data} due to unrecoverable error #{e}"
   end
-
 end

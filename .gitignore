@@ -2,6 +2,15 @@
 pdfs.links
 *.pdf*
 Gemfile.lock
+*.tmp
+*.bak
+*.log
+
+# Guard
+bin/*
+*/bin
+*/*/bin
+*/*/*/bin
 
 # IntelliJ
 */*/*/.idea
@@ -12,6 +21,7 @@ Gemfile.lock
 */*.isw
 */*.iml
 *.iml
+*.iws
 
 # Maven
 */target/**
@@ -20,5 +30,4 @@ Gemfile.lock
 # Gradle
 */build
 */.gradle
-
 /.project

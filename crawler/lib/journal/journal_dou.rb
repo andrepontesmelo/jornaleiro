@@ -7,13 +7,14 @@ require_relative '../journal'
 require_relative '../capybara_util'
 
 module Jornaleiro
+  # Base class for DOU crawlers
   class JournalDOU < Journal
-    def get_journal_id
+    def journal_id
       3
     end
 
     def valid_date(data)
-      return (!data.sunday? && !data.saturday?)
+      !data.sunday? && !data.saturday?
     end
   end
 end

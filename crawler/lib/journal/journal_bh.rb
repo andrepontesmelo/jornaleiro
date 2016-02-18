@@ -8,106 +8,105 @@ require_relative '../capybara_util'
 require_relative '../journal'
 
 module Jornaleiro
-
+  # Crawler for  Belo Horizonte municipal public journal
   class JournalBH < Journal
-
     include Capybara::DSL
-    HOST = 'http://portal6.pbh.gov.br'
+    HOST = 'http://portal6.pbh.gov.br'.freeze
     SESSION_ID = 4
 
     def initialize
-      super()
-
+      super
     end
 
-    def valid_date?(data)
-      !data.sunday? && !data.monday?
+    def valid_date?(date)
+      !date.sunday? && !date.monday?
     end
 
-    def get_initial_date
-      return Date.parse('1996-01-04')
+    def initial_date
+      Date.parse('1996-02-17')
     end
 
-    def get_journal_id
+    def journal_id
       2
     end
 
     def prepare
       super
 
-      CapybaraUtil.new.set_driver(:poltergeist)
+      CapybaraUtil.new.use_poltergeist
       Capybara.app_host = Capybara.default_host = HOST
+
+      puts 'fetch_date BH'
     end
 
-    def fetch_date(day, month, year, data)
+    def save_articles(articles, date)
+      pgsql = PgSQL.new
 
+      articles.each_with_index do |article, page|
+        pgsql.insert_document(date, page, SESSION_ID, article[:content],
+                              article[:title], article[:url])
+      end
+
+      pgsql.destroy
+    end
+
+    def fetch_date(day, month, year, date)
       prepare
-      puts "fetch_date BH"
 
       articles = fetch_articles(day, month, year)
 
-      if (!articles.nil?)
-        pgsql = PgSQL.new
-
-        articles.each_with_index { |article, page|
-          pgsql.insert_document(data, page, SESSION_ID , article[:content], article[:title], article[:url])
-        }
-
-        pgsql.destroy()
-      end
+      save_articles(articles, date) unless articles.nil?
     end
 
-
-    def fetch_articles(day, month, year)
-
-      articles = Array.new();
-
+    def fetch_hrefs(day, month, year)
       page.reset_session!
 
-      visit("/dom/iniciaEdicao.do?method=DomDia&day=#{day}/#{month}/#{year}&comboAno=#{year}")
-
-      puts "#{HOST}/dom/iniciaEdicao.do?method=DomDia&day=#{day}/#{month}/#{year}&comboAno=#{year}"
-
+      visit "/dom/iniciaEdicao.do?method=DomDia&day=#{day}" \
+            "/#{month}/#{year}&comboAno=#{year}"
 
       find('#imgExtRecTodos').click
 
-      hrefs = all(:css, ".ChamadaArtigo")
+      hrefs = all(:css, '.ChamadaArtigo')
 
-      puts " * #{hrefs.length} "
+      puts " * #{hrefs.length}"
 
-      hrefs.each { |href|
-
-        article = {}
-
-        article[:title] = href.text
-
-        print '.'
-
-        url = href.first("a")["href"]
-
-        within_window open_new_window do
-          visit(url)
-
-          article[:content] = all("#esquerda")[1].text
-          article[:url] = url
-          page.execute_script "window.close();"
-        end
-
-        articles.push(article);
-      }
-
-      puts ""
-
-      articles
-
-    rescue Capybara::ElementNotFound, Capybara::Poltergeist::TimeoutError, Capybara::Poltergeist::DeadClient => e
+      hrefs
+    rescue Capybara::ElementNotFound, Capybara::Poltergeist::TimeoutError,
+           Capybara::Poltergeist::DeadClient => e
       puts e.message
     end
 
+    def fetch_article(href)
+      article = {}
+
+      article[:title] = href.text
+      article[:url] = href.first('a')['href']
+      print '.'
+
+      within_window open_new_window do
+        visit article[:url]
+
+        article[:content] = all('#esquerda')[1].text
+        page.execute_script 'window.close();'
+      end
+
+      article
+    end
+
+    def fetch_articles(day, month, year)
+      articles = []
+      hrefs = fetch_hrefs(day, month, year)
+
+      hrefs.each do |href|
+        articles.push fetch_article(href)
+      end
+
+      puts ''
+
+      articles
+    rescue Capybara::ElementNotFound, Capybara::Poltergeist::TimeoutError,
+           Capybara::Poltergeist::DeadClient => e
+      puts e.message
+    end
   end
-
 end
-
-
-
-

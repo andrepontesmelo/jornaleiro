@@ -13,8 +13,8 @@ module Jornaleiro
       3
     end
 
-    def valid_date(data)
-      !data.sunday? && !data.saturday?
+    def valid_date(date)
+      !date.sunday? && !date.saturday?
     end
   end
 end

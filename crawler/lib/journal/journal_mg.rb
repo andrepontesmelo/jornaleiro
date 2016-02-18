@@ -55,8 +55,8 @@ module Jornaleiro
       Date.parse('1996-10-04')
     end
 
-    def valid_date?(data)
-      (!data.sunday? && !data.monday?)
+    def valid_date?(date)
+      !date.sunday? && !date.monday?
     end
 
     def fix_encoding(string)
@@ -172,8 +172,7 @@ module Jornaleiro
       click_on(@months[month - 1])
 
       within('#id-lista-subcomunidades') do
-        link_dia = page.find_link(day.to_s)
-        link_dia.click
+        page.find_link(day.to_s).click
       end
 
       fetch_sessions
@@ -229,7 +228,7 @@ module Jornaleiro
       pgsql.destroy
     end
 
-    def fetch_date(day, month, year, data)
+    def fetch_date(day, month, year, date)
       puts 'fetch_date MG'
       prepare
 
@@ -241,11 +240,11 @@ module Jornaleiro
 
         @bash_tools.crawle_pdfs(LINKS_FILE) unless documents.merge_links.empty?
 
-        insert(documents, data)
+        insert(documents, date)
       end
     end
 
   rescue Capybara::ElementNotFound => e
-    puts "Skipping date #{data} due to unrecoverable error #{e}"
+    puts "Skipping date #{date} due to unrecoverable error #{e}"
   end
 end

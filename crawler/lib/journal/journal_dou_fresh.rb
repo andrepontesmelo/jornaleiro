@@ -193,16 +193,16 @@ module Jornaleiro
       pgsql.destroy
     end
 
-    def fetch_date(day, month, year, data)
+    def fetch_date(day, month, year, date)
       prepare
       puts 'fetch_date DOU'
       download(day, month, year)
       clean_file_names
       @bash_tools.pdf_to_text_pages_pages
-      insert_db(data)
+      insert_db(date)
 
     rescue Capybara::ElementNotFound => e
-      puts "Skipping date #{data} due to unrecovery error #{e}."
+      puts "Skipping date #{date} due to unrecovery error #{e}."
     end
   end
 end

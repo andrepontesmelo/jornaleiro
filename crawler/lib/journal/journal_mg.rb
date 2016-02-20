@@ -8,6 +8,7 @@ require_relative '../capybara_util'
 require_relative '../journal'
 require_relative '../meta_documents'
 require_relative '../bash_tools'
+require_relative '../date_helper'
 
 module Jornaleiro
   # Crawler for Minas Gerais state level public journal.
@@ -42,9 +43,7 @@ module Jornaleiro
       @docs = MetaDocuments.new
       @tmp_path = "/tmp/#{JOURNAL_SHORT_NAME}"
       @bash_tools = BashTools.new(@tmp_path)
-
-      @months = %w(Janeiro Fevereiro Março Abril Maio Junho Julho \\
-                   Agosto Setembro Outubro Novembro Dezembro)
+      @date_helper = DateHelper.new
     end
 
     def journal_id
@@ -169,7 +168,7 @@ module Jornaleiro
         click_on(year)
       end
 
-      click_on(@months[month - 1])
+      click_on(@date_helper.month_name(month))
 
       within('#id-lista-subcomunidades') do
         page.find_link(day.to_s).click

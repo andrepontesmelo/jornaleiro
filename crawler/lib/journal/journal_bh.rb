@@ -52,7 +52,6 @@ module Jornaleiro
 
     def fetch_date(day, month, year, date)
       prepare
-
       articles = fetch_articles(day, month, year)
 
       save_articles(articles, date) unless articles.nil?
@@ -61,14 +60,13 @@ module Jornaleiro
     def fetch_hrefs(day, month, year)
       page.reset_session!
 
-      visit "/dom/iniciaEdicao.do?method=DomDia&day=#{day}" \
+      visit "/dom/iniciaEdicao.do?method=DomDia&dia=#{day}" \
             "/#{month}/#{year}&comboAno=#{year}"
 
       find('#imgExtRecTodos').click
 
       hrefs = all(:css, '.ChamadaArtigo')
-
-      puts " * #{hrefs.length}"
+      puts " * #{page.current_url} has #{hrefs.length} pages"
 
       hrefs
     rescue Capybara::ElementNotFound, Capybara::Poltergeist::TimeoutError,

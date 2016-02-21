@@ -68,7 +68,7 @@ module Jornaleiro
     def parse_date(date)
       year = date.year.to_s
       day = format('%02.f', date.mday)
-      month = date.month
+      month = format('%02.f', date.month)
 
       return day, month, year
     end

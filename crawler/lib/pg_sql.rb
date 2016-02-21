@@ -56,11 +56,7 @@ module Jornaleiro
 
       date = Date.parse(@database.fetch(sql).first[:date].to_s)
 
-      puts sql
-      puts date
-
       date
-
     rescue StandardError => e
       puts "The database is empty: #{e.message} #{e}"
       nil

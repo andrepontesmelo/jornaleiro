@@ -7,6 +7,7 @@ module Jornaleiro
     end
 
     def month_name(month_number)
+      month_number = month_number.to_i if month_number.class == ''.class
       @months[month_number - 1]
     end
   end

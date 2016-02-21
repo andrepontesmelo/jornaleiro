@@ -1,3 +1,5 @@
+require 'pry'
+
 module Jornaleiro
   # Requires linux bash and pdftotext external tool
   class BashTools
@@ -11,7 +13,7 @@ module Jornaleiro
       output = `pdfinfo #{pdf} | grep Pages:`
       page_count = output.split(' ').last.to_i
 
-      [1..page_count].each do |p|
+      for p in [1..page_count] do
         pdf_page_to_text pdf, p
       end
 
@@ -48,7 +50,7 @@ module Jornaleiro
     end
 
     def pdf_to_text_pages_pages
-      Dir.chdir(folder) do
+      Dir.chdir(@path) do
         files = Dir.entries('.')
 
         files.each do |f|

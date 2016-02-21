@@ -99,6 +99,10 @@ module Jornaleiro
       pages
     end
 
+    def close_window_within(w)
+      within_window w { close_window }
+    end
+
     def fetch_session(session_title, session_id)
       meta = MetaDocument.new(session_id)
 
@@ -124,9 +128,7 @@ module Jornaleiro
     rescue Capybara::ElementNotFound => e
       print "\nSkipping '#{session_title}' - #{e.message} "
 
-      if page.windows.count > 1 
-        within_window opened_window { close_window }
-      end
+      close_window_within(opened_window) if page.windows.count > 1
 
       raise StandardError if e.message.include? 'framePdf'
       puts ' - Will not try again.'
@@ -168,6 +170,7 @@ module Jornaleiro
         click_on(year)
       end
 
+      month_name = @date_helper.month_name(month)
       click_on(@date_helper.month_name(month))
 
       within('#id-lista-subcomunidades') do
@@ -181,6 +184,9 @@ module Jornaleiro
       if e.message.eql?("Unable to find link \"#{day}\"")
         puts "The is no public journal @ #{day}."
         return nil
+      elsif e.message.eql?("Unable to find link or button \"#{month_name}\"")
+        puts "The is no public journal @ #{month_name}."
+        return nil
       else
         puts e.message
         sleep 10
@@ -190,7 +196,7 @@ module Jornaleiro
 
     def prepare
       super
-
+      puts 'fetch_date MG'
       CapybaraUtil.new.use_poltergeist
       Capybara.app_host = HOST
     end
@@ -206,9 +212,7 @@ module Jornaleiro
     def insert_document(document, date, pgsql)
       session_id = document.session_id
       session = document.session
-      
-      puts "Inserting #{document.page_count} documents within session #{session}."
-
+      puts " + #{document.page_count} documents @ session #{session}."
       for p in 1..document.page_count do
         print '.'
         content = read_file(session, session_id, p)
@@ -228,22 +232,17 @@ module Jornaleiro
     end
 
     def fetch_date(day, month, year, date)
-      puts 'fetch_date MG'
       prepare
-
       @docs = MetaDocuments.new
       @recovery = {}
       documents = fetch_meta_documents(day, month, year)
       unless documents.nil?
         save_links(LINKS_FILE)
-
         @bash_tools.crawle_pdfs(LINKS_FILE) unless documents.merge_links.empty?
-
         insert(documents, date)
       end
+    rescue Capybara::ElementNotFound => e
+      puts "Skipping date #{date} due to unrecoverable error #{e}"
     end
-
-  rescue Capybara::ElementNotFound => e
-    puts "Skipping date #{date} due to unrecoverable error #{e}"
   end
 end

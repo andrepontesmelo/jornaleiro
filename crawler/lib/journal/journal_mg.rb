@@ -51,7 +51,7 @@ module Jornaleiro
     end
 
     def initial_date
-      Date.parse('1996-10-04')
+      Date.parse('2005-12-27')
     end
 
     def valid_date?(date)

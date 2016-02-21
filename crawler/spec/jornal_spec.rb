@@ -56,6 +56,7 @@ module Jornaleiro
         Date.parse('2001-01-02'))
 
       expect(j.within_range?(Date.parse('2001-01-01'))).to be_falsey
+      expect(j.should_fetch(Date.parse('2001-01-01'))).to be_falsey
     end
 
     it 'should accept a valid date with initial date constraint' do
@@ -66,16 +67,18 @@ module Jornaleiro
         Date.parse('2001-01-02'))
 
       expect(j.within_range?(Date.parse('2001-01-03'))).to be_truthy
+      expect(j.should_fetch(Date.parse('2001-01-03'))).to be_truthy
     end
 
     it 'should accept a valid date with max date constraint' do
       allow_any_instance_of(Journal).to receive(:last_fetched_date).and_return(
         Date.parse('2014-01-02'))
 
-      allow_any_instance_of(Journal).to receive(:last_fetched_date).and_return(
+      allow_any_instance_of(Journal).to receive(:max_date).and_return(
         Date.parse('2001-01-02'))
 
       expect(j.within_range?(Date.parse('2001-01-01'))).to be_truthy
+      expect(j.should_fetch(Date.parse('2001-01-01'))).to be_truthy
     end
 
     it 'should constraint max date' do
@@ -86,6 +89,7 @@ module Jornaleiro
         Date.parse('2001-01-02'))
 
       expect(j.within_range?(Date.parse('2001-01-03'))).to be_falsey
+      expect(j.should_fetch(Date.parse('2001-01-03'))).to be_falsey
     end
 
     it 'should accept a valid date with initial and max date constraint' do

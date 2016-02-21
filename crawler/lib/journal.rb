@@ -112,16 +112,16 @@ module Jornaleiro
       date
     end
 
-    def should_fetch
+    def should_fetch(date)
+      return false if date.nil?
       return true if last_fetched_date.nil?
-      return true if initial_date.nil?
-      last_fetched_date > initial_date
+      within_range?(date)
     end
 
     def start
       date = next_date(last_fetched_date)
 
-      while should_fetch
+      while should_fetch(date)
         day, month, year = parse_date(date)
 
         print " * #{year}-#{month}-#{day} "

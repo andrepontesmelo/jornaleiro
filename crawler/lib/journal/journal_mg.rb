@@ -73,7 +73,7 @@ module Jornaleiro
 
         print(p % 10 == 0 ? (p / 10) : '.')
 
-        fill_in 'input-pagina-destino', :with => p.to_s
+        fill_in 'input-pagina-destino', with: p.to_s
         sleep 1
         click_on('ok')
         sleep 1
@@ -107,7 +107,7 @@ module Jornaleiro
       meta = MetaDocument.new(session_id)
 
       opened_window = window_opened_by do
-        click_on(session_title)
+        click_link(session_title, match: :first)
       end
 
       puts "Session id is #{session_id}"

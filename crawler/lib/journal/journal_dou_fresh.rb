@@ -26,7 +26,7 @@ module Jornaleiro
       super
 
       CapybaraUtil.new.use_poltergeist
-      Capybara.app_host = 'http://portal.in.gov.br'
+      Capybara.app_host = 'http://portal.imprensanacional.gov.br/'
     end
 
     def session_id(session_name)
@@ -41,6 +41,11 @@ module Jornaleiro
       file_name[/\w+.pdf/]
     end
 
+    def rename(from, to)
+      puts "rename #{from} => #{to}"
+      File.rename(from, to)
+    end
+
     def clean_file_names
       puts 'Step 3: Cleaning pdf file names.'
 
@@ -49,7 +54,7 @@ module Jornaleiro
 
         files.each do |f|
           cleaned = clean_file_name(f)
-          File.rename(f, cleaned) unless cleaned.nil?
+          rename(f, cleaned) unless cleaned.nil?
         end
       end
     end
@@ -58,13 +63,22 @@ module Jornaleiro
       Date.parse('2015-03-03')
     end
 
-    def browse(day, month, year)
-      visit '/#leitura_jornais'
-      check 'chk_avancada_0'
-      fill_in 'dt_inicio_leitura_jornais', with: "#{day}/#{month}"
-      fill_in 'dt_fim_leitura_jornais', with: "#{day}/#{month}"
+    def select_date(day, month, year)
+      start_date = all('.dateInput').first
+      last_date = all('.dateInput').last
+      start_date.set("#{day}/#{month}")
+      last_date.set("#{day}/#{month}")
+      year_box = page.all(:xpath, '//select').first
+      year_box = year_box.find(:xpath,
+                               "//option[normalize-space(text())='#{year}']")
+      year_box.select_option
+    end
 
-      select year.to_s, :from => 'ano_leitura_jornais'
+    def browse(day, month, year)
+      visit '/'
+      click_on 'Leitura de Jornais'
+      check 'chk_avancada_0'
+      select_date(day, month, year)
 
       result_window = window_opened_by do
         click_on 'BUSCAR'
@@ -88,6 +102,7 @@ module Jornaleiro
     end
 
     def discover_main_urls(urls)
+      page.save_screenshot('/tmp/file2.png')
       urls[:do1] = hrefs[5][:onclick].to_s[/(http.+')/].to_s.chomp("'")
       urls[:do2] = hrefs[11][:onclick].to_s[/(http.+')/].to_s.chomp("'")
       urls[:do3] = hrefs[17][:onclick].to_s[/(http.+')/].to_s.chomp("'")
@@ -172,7 +187,7 @@ module Jornaleiro
       attrs
     end
 
-    def insert_document(pgsql, file, date)
+    def insert_document(pgsql, file, date, attr)
       content = File.read(file)
       pgsql.insert_document(date, attr[:page], attr[:session], content)
       print '.'
@@ -186,7 +201,7 @@ module Jornaleiro
         files = Dir.entries '.'
         files.each do |f|
           attr = (f.include?('.pdf') ? parse_file(f) : nil)
-          insert_document(pgsql, f, date) unless attr.nil?
+          insert_document(pgsql, f, date, attr) unless attr.nil?
         end
       end
 
@@ -200,7 +215,6 @@ module Jornaleiro
       clean_file_names
       @bash_tools.pdf_to_text_pages_pages
       insert_db(date)
-
     rescue Capybara::ElementNotFound => e
       puts "Skipping date #{date} due to unrecovery error #{e}."
     end

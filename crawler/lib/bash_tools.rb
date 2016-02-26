@@ -13,12 +13,12 @@ module Jornaleiro
       output = `pdfinfo #{pdf} | grep Pages:`
       page_count = output.split(' ').last.to_i
 
-      for p in [1..page_count] do
+      puts "pdftotext single page per page for #{pdf}"
+      for p in 1..page_count do
         pdf_page_to_text pdf, p
       end
 
-      puts "mv #{@path}/#{f} #{DOU_BACKUP_PATH}/#{f} "
-      system("mv #{@path}/#{f} #{DOU_BACKUP_PATH}/#{f} ")
+      puts ''
     end
 
     def pdf_page_to_text(pdf, page)

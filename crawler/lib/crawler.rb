@@ -1,6 +1,6 @@
 require_relative 'journal/journal_bh'
 require_relative 'journal/journal_mg'
-require_relative 'journal/journal_dou_proxy'
+require_relative 'journal/journal_dou_fresh'
 
 # Main module
 module Jornaleiro
@@ -9,9 +9,9 @@ module Jornaleiro
     attr_accessor :journals
 
     def initialize
-      @journals = [ #JournalDOUProxy.new,
-                    JournalMG.new,
-                   JournalBH.new]
+      @journals = [JournalMG.new,
+                   JournalBH.new,
+                   JournalDOUFresh.new]
     end
 
     def start

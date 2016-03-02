@@ -82,9 +82,10 @@ body {
   }
 }
 
-.highlightedText {
+.panel-default em {
     font-weight: bold;
     background: yellow;
+    font-style: normal;
 }
 
 /* in the css file or in a style block */

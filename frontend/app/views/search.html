@@ -1,25 +1,26 @@
 <div class="input-group">
   <span class="input-group-addon">
     <span ng-class="busy ? 'glyphicon glyphicon-hourglass' : 'glyphicon glyphicon-search'"></span>
-
   </span>
 
-  <input type="search" ng-model="query"  ng-keypress="keypress($event)" placeholder="Pesquise..." class="form-control" >
-
+  <input type="search" ng-model="query" ng-keypress="keypress($event)" placeholder="Pesquise..." class="form-control">
 </div>
 
-
-<div ng-show="searchResult != null">
-  {{searchResult.length}} Resultados em {{elapsedTime}}s
+<div ng-show="hits != null">
+  {{hits.total}} Resultados em {{elapsedTime}}s
 </div>
 
-<div ng-repeat="result in searchResult" class="panel panel-default">
-    <div class="panel-heading">{{result.date}} - {{result.age}} dias atrás. <div class="pull-right">{{result.session.title}} | {{result.session.journal.name}}</div></p> </div>
-    <div class="panel-body">
+<div ng-repeat="result in hits.hits" class="panel panel-default">
+  <div class="panel-heading">
+    {{result.fields.date[0] | date:'MM/dd/yyyy'}}
+    <div class="pull-right">Sessão {{fields.session}} | Journal</div>
+  </div>
+  <div class="panel-body">
+    <a ng-href="#/documento/{{result.fields.id[0]}}" class="btn btn-primary btn-md pull-right">
+      <span class="glyphicon glyphicon-circle-arrow-right"/>
+    </a>
 
-      <a ng-href="#/documento/{{result.id}}" class="btn btn-primary btn-md pull-right"> <span class="glyphicon glyphicon-circle-arrow-right"/> </a>
-
-      <p ng-bind-html="highlight(result.content, query)"/>
-    </div>
+    <p ng-bind-html="renderHtml(result.highlight.content[0])"></p>
+  </div>
 </div>
 </span>

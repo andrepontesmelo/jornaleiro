@@ -10,4 +10,3 @@ angular.module('frontendApp')
       }
     });
   });
-

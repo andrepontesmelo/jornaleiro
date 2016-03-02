@@ -22,8 +22,9 @@ module Jornaleiro
       content = content.gsub('\"', '\'')
       content = content.gsub("'", "\\\\'")
 
-      content = content.gsub('--', '-') while content.include? '--'
-      content = content.gsub('..', '.') while content.include? '..'
+      content = content.gsub(/[ \t\n\r]+/, ' ')
+      content = content.gsub(/[.]+/, '.')
+      content = content.gsub(/[-]+/, '-')
 
       content.encode!(Encoding.find('UTF-8'), encoding_options)
       Unicode.downcase(content)

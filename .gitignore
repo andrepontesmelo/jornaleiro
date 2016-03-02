@@ -22,6 +22,7 @@ bin/*
 */*.iml
 *.iml
 *.iws
+*.ipr
 
 # Maven
 */target/**

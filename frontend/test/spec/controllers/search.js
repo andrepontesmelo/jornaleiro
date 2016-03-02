@@ -15,10 +15,10 @@ describe('Controller: SearchCtrl', function () {
   }));
 
   it('should remove spaces within query', function () {
-    expect(SearchCtrl.removeSpaces('andre pontes')).toBe('andre_pontes');
+    expect(scope.removeSpaces('andre pontes')).toBe('andre_pontes');
   });
 
   it('should add spaces in query', function () {
-    expect(SearchCtrl.addSpaces('andre_pontes')).toBe('andre pontes');
+    expect(scope.addSpaces('andre_pontes')).toBe('andre pontes');
   });
 });

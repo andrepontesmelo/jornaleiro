@@ -5,22 +5,17 @@ import jornaleiro.service.PgSQLAccess;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Session {
     private static HashMap<Integer, jornaleiro.dto.Session> hashSession = null;
+    private static ArrayList<jornaleiro.dto.Session> sessions = null;
 
-    public static jornaleiro.dto.Session getSession(int id) throws Exception
-    {
+    public static jornaleiro.dto.Session getSession(int id) throws Exception {
         if (hashSession == null || hashSession.size() == 0)
-        {
-            hashSession = new HashMap<Integer, jornaleiro.dto.Session>();
-            List<jornaleiro.dto.Session> sessionList = get();
+            createCache();
 
-            for (jornaleiro.dto.Session s : sessionList) {
-                hashSession.put(s.getId(), s);
-            }
-        }
         jornaleiro.dto.Session session = hashSession.get(id);
 
         if (session == null)
@@ -29,10 +24,25 @@ public class Session {
         return session;
     }
 
+    private static void createCache() throws Exception {
+        hashSession = new HashMap<>();
+        sessions = get();
 
-    private static List<jornaleiro.dto.Session> get() throws Exception  {
+        for (jornaleiro.dto.Session s : sessions) {
+            hashSession.put(s.getId(), s);
+        }
+    }
 
-        List<jornaleiro.dto.Session> sessionList = new LinkedList<jornaleiro.dto.Session>();
+    public static ArrayList<jornaleiro.dto.Session> getAll() throws Exception {
+        if (sessions == null)
+            createCache();
+
+        return sessions;
+    }
+
+    private static ArrayList<jornaleiro.dto.Session> get() throws Exception {
+
+        ArrayList<jornaleiro.dto.Session> sessionList = new ArrayList<>();
 
         Connection connection = PgSQLAccess.getInstance().getConnection();
 

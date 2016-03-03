@@ -1,0 +1,16 @@
+{
+    "mappings": {
+        "jdbc": {
+            "properties": {
+                "content": {
+                    "analyzer": "brazilian",
+                    "type": "string"
+                },
+                "title": {
+                    "analyzer": "brazilian",
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

@@ -1,8 +1,8 @@
 'use strict';
 
 angular.module('frontendApp')
-  .controller('SearchCtrl', ['$scope', '$sce', 'searchFactory', 'queryResult',
-     function ($scope, $sce, searchFactory, queryResult) {
+  .controller('SearchCtrl', ['$scope', '$sce', 'searchFactory', 'sessionFactory', 'queryResult',
+     function ($scope, $sce, searchFactory, sessionFactory, queryResult) {
 
       $scope.keypress = function(keyEvent) {
         if (keyEvent.which === 13) {
@@ -18,6 +18,21 @@ angular.module('frontendApp')
           });
         }
     };
+
+    sessionFactory.get().$promise.then(function(array) {
+     var arrayLength = array.length;
+     var cache = {};
+
+     for (var x = 0; x < arrayLength; x++) {
+       var idItem = array[x].id;
+       var item = { "session": array[x].title, "journal": array[x].journal.name };
+
+       cache[idItem] = item;
+     }
+
+     $scope.sessions = cache;
+   });
+
 
     $scope.removeSpaces = function(content) {
       return content.replace(/ /g, '_');

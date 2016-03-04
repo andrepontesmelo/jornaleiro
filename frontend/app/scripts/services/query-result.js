@@ -1,12 +1,5 @@
 'use strict';
 
-/**
- * @ngdoc service
- * @name frontendApp.queryResult
- * @description
- * # queryResult
- * Service in the frontendApp.
- */
 angular.module('frontendApp')
   .service('queryResult', function () {
     var query = '';

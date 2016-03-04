@@ -6,14 +6,16 @@
   <input type="search" ng-model="query" ng-keypress="keypress($event)" placeholder="Pesquise..." class="form-control">
 </div>
 
-<div ng-show="hits != null">
+<div ng-show="hits.total">
   {{hits.total}} Resultados em {{elapsedTime}}s
 </div>
 
 <div ng-repeat="result in hits.hits" class="panel panel-default">
   <div class="panel-heading">
     {{result.fields.date[0] | date:'MM/dd/yyyy'}}
-    <div class="pull-right">Sessão {{fields.session}} | Journal</div>
+    <div class="pull-right">{{ sessions[result.fields.session[0]].session  }} |
+      {{ sessions[result.fields.session[0]].journal }}
+    </div>
   </div>
   <div class="panel-body">
     <a ng-href="#/documento/{{result.fields.id[0]}}" class="btn btn-primary btn-md pull-right">

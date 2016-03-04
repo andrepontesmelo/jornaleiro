@@ -82,7 +82,7 @@ body {
   }
 }
 
-.panel-default em {
+.highlightedText, .panel-default em {
     font-weight: bold;
     background: yellow;
     font-style: normal;

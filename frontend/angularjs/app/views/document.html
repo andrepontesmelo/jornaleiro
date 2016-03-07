@@ -8,6 +8,6 @@
 <p>página {{document.page}}</p>
 <p><a ng-href="#/documento/{{before}}"> Anterior </a></p>
 
-<div ng-bind-html="highlight(document.content, query)"/>
+<div ng-show="!busy" ng-bind-html="highlight(document.content, query)"/>
 
 <p><a ng-href="#/documento/{{after}}"> Próximo</a></p>

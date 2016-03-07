@@ -7,11 +7,14 @@ angular.module('frontendApp')
 
     $scope.query = queryResult.getQuery();
 
+    $scope.busy = true;
+
     documentFactory.get({id: $routeParams.id}, function (documentFactory) {
       $scope.document = documentFactory.document;
       $scope.after = documentFactory.after;
       $scope.before = documentFactory.before;
       $scope.id = documentFactory.id;
+      $scope.busy = false;
     });
 
     $scope.highlight = function(text, search) {

@@ -6,8 +6,9 @@
 
 <div class="panel-heading"></div>
 <p>página {{document.page}}</p>
-<p><a ng-href="#/documento/{{before}}"> Anterior </a></p>
+
+<a ng-href="#/documento/{{before}}"> Anterior </a><a ng-href="#/documento/{{after}}" class="pull-right"> Próximo</a>
 
 <div ng-show="!busy" ng-bind-html="highlight(document.content, query)"/>
 
-<p><a ng-href="#/documento/{{after}}"> Próximo</a></p>
+<a ng-href="#/documento/{{before}}"> Anterior </a><a ng-href="#/documento/{{after}}" class="pull-right"> Próximo</a>

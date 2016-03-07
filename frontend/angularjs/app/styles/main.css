@@ -107,3 +107,7 @@ body {
 .angular-with-newlines {
     white-space: pre-wrap;
 }
+
+.bottom20 {
+  margin-bottom: 20px
+}

@@ -6,7 +6,7 @@
   <input type="search" ng-model="query" ng-keypress="keypress($event)" placeholder="Pesquise..." class="form-control">
 </div>
 
-<div ng-show="!busy">
+<div ng-show="!busy && searched">
   {{hits.total}} Resultados em {{elapsedTime}}s
 </div>
 

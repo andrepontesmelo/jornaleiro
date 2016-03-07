@@ -4,6 +4,7 @@ angular.module('frontendApp')
   .controller('SearchCtrl', ['$scope', '$sce', 'searchFactory', 'sessionFactory', 'queryResult',
      function ($scope, $sce, searchFactory, sessionFactory, queryResult) {
 
+
       $scope.keypress = function(keyEvent) {
         if (keyEvent.which === 13) {
 
@@ -15,6 +16,7 @@ angular.module('frontendApp')
             queryResult.setResult($scope.hits);
             $scope.elapsedTime = Math.round(searchFactory.elapsedTime * 100) / 100;
             $scope.busy = false;
+            $scope.searched = true;
           });
         }
     };

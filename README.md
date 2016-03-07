@@ -1,4 +1,4 @@
-Jornaleiro is an open source search engine of Brazilian public journals. You can play with it [here](https://jornaleiro.ignorelist.com)
+Jornaleiro is an open source search engine of Brazilian public journals. You can play with it [here](https://www.jornaleirooficial.com)
 
 ## Interest
 

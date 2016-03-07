@@ -1,12 +1,15 @@
-<h1>{{document.session.journal.name}}</h1>
-<h2>{{document.session.title}}
-  <small>{{document.date}}, pág. {{document.page}}</small>
-</h2>
+<div ng-show="!busy">
+  <h1>{{document.session.journal.name}}</h1>
+  <h2>
+    {{document.session.title}}
+    <small>{{document.date}}, pág. {{document.page}}</small>
+  </h2>
 
-<a ng-href="#/documento/{{before}}" class="glyphicon glyphicon-arrow-left"/>
-<a ng-href="#/documento/{{after}}" class="glyphicon glyphicon-arrow-right pull-right"/>
+  <a ng-href="#/documento/{{before}}" class="glyphicon glyphicon-arrow-left"/>
+  <a ng-href="#/documento/{{after}}" class="glyphicon glyphicon-arrow-right pull-right"/>
 
-<div ng-bind-html="highlight(document.content, query)"/>
+  <div ng-bind-html="highlight(document.content, query)"/>
 
-<a ng-href="#/documento/{{before}}" class="glyphicon glyphicon-arrow-left"/>
-<a ng-href="#/documento/{{after}}" class="glyphicon glyphicon-arrow-right pull-right"/>
+  <a ng-href="#/documento/{{before}}" class="glyphicon glyphicon-arrow-left"/>
+  <a ng-href="#/documento/{{after}}" class="glyphicon glyphicon-arrow-right pull-right"/>
+</div>

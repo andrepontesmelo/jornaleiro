@@ -1,4 +1,4 @@
-<div class="bottom20">
+<div class="bottom50">
   <div class="input-group">
     <span class="input-group-addon">
       <span ng-class="busy ? 'glyphicon glyphicon-hourglass' : 'glyphicon glyphicon-search'"></span>
@@ -7,8 +7,8 @@
     <input type="search" ng-model="query" ng-keypress="keypress($event)" placeholder="Pesquise..." class="form-control">
   </div>
 
-  <div ng-show="!busy && searched">
-    {{hits.total}} Resultados em {{elapsedTime}}s
+  <div ng-show="!busy && searched" class="pull-right">
+    <small>{{hits.total}} documentos em {{elapsedTime}}s</small>
   </div>
 </div>
 

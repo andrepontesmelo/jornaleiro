@@ -23,7 +23,13 @@ angular.module('frontendApp')
         return $sce.trustAsHtml(text);
       }
 
-      return $sce.trustAsHtml(window.unescape(window.escape(text).replace(new RegExp(window.escape(search), 'gi'),
-        '<span class="highlightedText">$&</span>')));
+      var highlightExp = new RegExp(window.escape(search), 'gi');
+      var replaced = window.escape(text).replace(highlightExp, '<span class="highlightedText">$&</span>');
+
+      replaced = replaced.replace(new RegExp(window.escape('; '), 'gi'), '<br/>');
+      replaced = replaced.replace(new RegExp(window.escape(' - '), 'gi'), '<br/>');
+      replaced = replaced.replace(new RegExp(window.escape('r$'), 'gi'), 'R$');
+
+      return $sce.trustAsHtml(window.unescape(replaced));
     };
 }]);

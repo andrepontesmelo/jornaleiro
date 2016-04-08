@@ -1,0 +1,28 @@
+{
+    "fields": [
+        {
+            "name": "query_id",
+            "type": "Integer"
+        },
+        {
+            "name": "session_id",
+            "type": "Integer"
+        },
+        {
+            "name": "page",
+            "type": "Integer"
+        },
+        {
+            "name": "date",
+            "type": "Date"
+        },
+        {
+            "name": "content",
+            "type": "String"
+        },
+        {
+            "name": "document_id",
+            "type": "Integer"
+        }
+    ]
+}

@@ -1,0 +1,13 @@
+{
+    "authority": "com.example.app.provider",
+    "databaseFileName": "jornaleiro.db",
+    "databaseVersion": 1,
+    "enableForeignKeys": true,
+    "projectPackageId": "com.jornaleirooficial.jornaleiro",
+    "providerClassName": "LocalProvider",
+    "providerJavaPackage": "com.jornaleirooficial.jornaleiro.provider",
+    "sqliteOpenHelperCallbacksClassName": "LocalSQLiteOpenHelperCallbacks",
+    "sqliteOpenHelperClassName": "LocalSQLiteOpenHelper",
+    "syntaxVersion": 3,
+    "useAnnotations": true
+}

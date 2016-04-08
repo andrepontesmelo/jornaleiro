@@ -1,0 +1,12 @@
+{
+    "fields": [
+        {
+            "name": "title",
+            "type": "String"
+        },
+        {
+            "name": "journal_id",
+            "type": "Integer"
+        }
+    ]
+}

@@ -1,7 +1,5 @@
 package com.jornaleirooficial.jornaleiro.provider;
 
-import java.util.Arrays;
-
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
@@ -18,17 +16,15 @@ import com.jornaleirooficial.jornaleiro.provider.query.QueryColumns;
 import com.jornaleirooficial.jornaleiro.provider.session.SessionColumns;
 import com.jornaleirooficial.jornaleiro.provider.snippet.SnippetColumns;
 
+import java.util.Arrays;
+
 public class LocalProvider extends BaseContentProvider {
+    public static final String AUTHORITY = "com.jornaleirooficial.jornaleiro.provider";
+    public static final String CONTENT_URI_BASE = "content://" + AUTHORITY;
     private static final String TAG = LocalProvider.class.getSimpleName();
-
     private static final boolean DEBUG = BuildConfig.DEBUG;
-
     private static final String TYPE_CURSOR_ITEM = "vnd.android.cursor.item/";
     private static final String TYPE_CURSOR_DIR = "vnd.android.cursor.dir/";
-
-    public static final String AUTHORITY = "com.example.app.provider";
-    public static final String CONTENT_URI_BASE = "content://" + AUTHORITY;
-
     private static final int URI_TYPE_DOCUMENT = 0;
     private static final int URI_TYPE_DOCUMENT_ID = 1;
 
@@ -72,7 +68,7 @@ public class LocalProvider extends BaseContentProvider {
     }
 
     @Override
-    public String getType(Uri uri) {
+    public String getType(@NonNull Uri uri) {
         int match = URI_MATCHER.match(uri);
         switch (match) {
             case URI_TYPE_DOCUMENT:

@@ -1,12 +1,11 @@
 package com.jornaleirooficial.jornaleiro.provider.document;
 
-import java.util.Date;
-
 import android.database.Cursor;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.jornaleirooficial.jornaleiro.provider.base.AbstractCursor;
+
+import java.util.Date;
 
 /**
  * Cursor wrapper for the {@code document} table.

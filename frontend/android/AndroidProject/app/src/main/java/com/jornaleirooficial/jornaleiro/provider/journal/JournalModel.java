@@ -1,11 +1,8 @@
 package com.jornaleirooficial.jornaleiro.provider.journal;
 
-import com.jornaleirooficial.jornaleiro.provider.base.BaseModel;
-
-import java.util.Date;
-
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+
+import com.jornaleirooficial.jornaleiro.provider.base.BaseModel;
 
 /**
  * Data model for the {@code journal} table.

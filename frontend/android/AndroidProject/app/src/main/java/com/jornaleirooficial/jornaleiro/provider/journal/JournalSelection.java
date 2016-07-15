@@ -1,9 +1,7 @@
 package com.jornaleirooficial.jornaleiro.provider.journal;
 
-import java.util.Date;
-
-import android.content.Context;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 

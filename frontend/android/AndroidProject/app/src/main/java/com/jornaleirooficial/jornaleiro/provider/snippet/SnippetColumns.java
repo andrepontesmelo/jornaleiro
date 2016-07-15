@@ -4,11 +4,6 @@ import android.net.Uri;
 import android.provider.BaseColumns;
 
 import com.jornaleirooficial.jornaleiro.provider.LocalProvider;
-import com.jornaleirooficial.jornaleiro.provider.document.DocumentColumns;
-import com.jornaleirooficial.jornaleiro.provider.journal.JournalColumns;
-import com.jornaleirooficial.jornaleiro.provider.query.QueryColumns;
-import com.jornaleirooficial.jornaleiro.provider.session.SessionColumns;
-import com.jornaleirooficial.jornaleiro.provider.snippet.SnippetColumns;
 
 /**
  * Columns for the {@code snippet} table.

@@ -1,14 +1,13 @@
 package com.jornaleirooficial.jornaleiro.provider.document;
 
-import java.util.Date;
-
-import android.content.Context;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.net.Uri;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.jornaleirooficial.jornaleiro.provider.base.AbstractContentValues;
+
+import java.util.Date;
 
 /**
  * Content values wrapper for the {@code document} table.
@@ -32,7 +31,6 @@ public class DocumentContentValues extends AbstractContentValues {
     /**
      * Update row(s) using the values stored by this object and the given selection.
      *
-     * @param contentResolver The content resolver to use.
      * @param where The selection to use (can be {@code null}).
      */
     public int update(Context context, @Nullable DocumentSelection where) {

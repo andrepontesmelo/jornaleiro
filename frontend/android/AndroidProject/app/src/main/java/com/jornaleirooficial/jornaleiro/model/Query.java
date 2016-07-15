@@ -2,7 +2,6 @@ package com.jornaleirooficial.jornaleiro.model;
 
 import android.content.ContentResolver;
 import android.database.Cursor;
-import android.net.Uri;
 
 import com.jornaleirooficial.jornaleiro.provider.query.QueryColumns;
 import com.jornaleirooficial.jornaleiro.provider.query.QueryContentValues;
@@ -54,7 +53,7 @@ public class Query {
     public void Insert() {
         QueryContentValues values = new QueryContentValues();
         values.putPhrase(phrase);
-        Uri uri = values.insert(resolver);
+        values.insert(resolver);
     }
 
     public static void Insert(String phrase, ContentResolver resolver) {

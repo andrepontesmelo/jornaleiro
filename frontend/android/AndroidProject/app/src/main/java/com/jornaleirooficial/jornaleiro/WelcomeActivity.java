@@ -14,7 +14,7 @@ import android.widget.EditText;
 
 import com.jornaleirooficial.jornaleiro.model.Query;
 
-public class MainActivity extends AppCompatActivity {
+public class WelcomeActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -56,4 +56,10 @@ public class Query {
         values.putPhrase(phrase);
         Uri uri = values.insert(resolver);
     }
+
+    public static void Insert(String phrase, ContentResolver resolver) {
+        Query newQuery = new Query(resolver);
+        newQuery.setPhrase(phrase);
+        newQuery.Insert();
+    }
 }

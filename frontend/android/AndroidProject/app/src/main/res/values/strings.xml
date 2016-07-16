@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">Jornaleiro</string>
     <string name="action_settings">Settings</string>
+    <string name="ok">OK</string>
+    <string name="cancel">CANCELAR</string>
+    <string name="welcome_new_phrase">Nova palavra ou frase</string>
+    <string name="welcome_text">Olá!\n\nComo está vazio isso!\n\nAdicione palavras-chaves para se manter informado de ocorrências nos jornais oficiais.</string>
 </resources>
